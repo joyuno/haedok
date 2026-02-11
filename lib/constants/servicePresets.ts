@@ -20,6 +20,8 @@ export interface ServicePreset {
   plans: ServicePlan[];
   familyPlan: FamilyPlan | null;
   note?: string;
+  cancellationUrl?: string;
+  brandColor?: string;
 }
 
 export const SERVICE_PRESETS: Record<string, ServicePreset> = {
@@ -40,6 +42,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 4,
     },
     note: '프리미엄 4인 공유 시 인당 4,250원',
+    cancellationUrl: 'https://www.netflix.com/cancelplan',
+    brandColor: '#E50914',
   },
   '디즈니+': {
     name: '디즈니+',
@@ -57,6 +61,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 4,
     },
     note: '프리미엄 4인 공유 시 인당 3,475원',
+    cancellationUrl: 'https://www.disneyplus.com/account',
+    brandColor: '#113CCF',
   },
   웨이브: {
     name: '웨이브',
@@ -74,6 +80,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 4,
     },
     note: '프리미엄 동시접속 4인',
+    cancellationUrl: 'https://www.wavve.com/my/membership',
+    brandColor: '#1DB4A4',
   },
   티빙: {
     name: '티빙',
@@ -91,6 +99,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 4,
     },
     note: '프리미엄 동시접속 4인',
+    cancellationUrl: 'https://www.tving.com/my',
+    brandColor: '#FF0558',
   },
   쿠팡플레이: {
     name: '쿠팡플레이',
@@ -99,6 +109,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     plans: [{ name: '로켓와우 포함', price: 7890, cycle: 'monthly' }],
     familyPlan: null,
     note: '쿠팡 로켓와우 멤버십에 포함',
+    cancellationUrl: 'https://www.coupang.com/np/coupangPlay',
+    brandColor: '#E6282E',
   },
   왓챠: {
     name: '왓챠',
@@ -115,6 +127,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 4,
     },
     note: '프리미엄 동시접속 4인',
+    cancellationUrl: 'https://watcha.com/settings/account',
+    brandColor: '#FF0558',
   },
   'Apple TV+': {
     name: 'Apple TV+',
@@ -131,6 +145,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 6,
     },
     note: 'Apple One 번들 가능',
+    cancellationUrl: 'https://support.apple.com/ko-kr/111771',
+    brandColor: '#000000',
   },
   'Amazon Prime Video': {
     name: 'Amazon Prime Video',
@@ -141,6 +157,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       { name: '연간', price: 49000, cycle: 'yearly' },
     ],
     familyPlan: null,
+    cancellationUrl: 'https://www.amazon.co.kr/gp/primecentral',
+    brandColor: '#00A8E1',
   },
   유튜브프리미엄: {
     name: '유튜브 프리미엄',
@@ -157,6 +175,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 6,
     },
     note: 'YouTube Music 포함',
+    cancellationUrl: 'https://www.youtube.com/paid_memberships',
+    brandColor: '#FF0000',
   },
 
   /* ── 음악 ────────────────────────────────────────────────── */
@@ -175,6 +195,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 6,
     },
     note: '패밀리 6인 공유 시 인당 약 2,817원',
+    cancellationUrl: 'https://www.spotify.com/account/subscription/',
+    brandColor: '#1DB954',
   },
   'Apple Music': {
     name: 'Apple Music',
@@ -192,6 +214,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 6,
     },
     note: 'Apple One 번들 가능',
+    cancellationUrl: 'https://support.apple.com/ko-kr/108380',
+    brandColor: '#FA2D48',
   },
   '지니뮤직': {
     name: '지니뮤직',
@@ -203,6 +227,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     ],
     familyPlan: null,
     note: '통신사 제휴 할인 가능',
+    cancellationUrl: 'https://www.genie.co.kr/myInfo/payment',
+    brandColor: '#3B82F6',
   },
   '멜론': {
     name: '멜론',
@@ -214,6 +240,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     ],
     familyPlan: null,
     note: '카카오 계정 연동',
+    cancellationUrl: 'https://www.melon.com/mymusic/ticket/mymusicticket_inform.htm',
+    brandColor: '#00CD3C',
   },
   'FLO': {
     name: 'FLO',
@@ -225,6 +253,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     ],
     familyPlan: null,
     note: 'SKT 제휴 할인 가능',
+    cancellationUrl: 'https://www.music-flo.com/my/pass',
+    brandColor: '#4CEDB0',
   },
   'YouTube Music': {
     name: 'YouTube Music',
@@ -238,6 +268,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 6,
     },
     note: 'YouTube 프리미엄에 포함',
+    cancellationUrl: 'https://www.youtube.com/paid_memberships',
+    brandColor: '#FF0000',
   },
 
   /* ── 쇼핑/배달 ──────────────────────────────────────────── */
@@ -248,6 +280,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     plans: [{ name: '월간', price: 7890, cycle: 'monthly' }],
     familyPlan: null,
     note: '쿠팡플레이, 쿠팡이츠 무료배달 포함',
+    cancellationUrl: 'https://www.coupang.com/np/coupangPlay',
+    brandColor: '#E6282E',
   },
   '네이버 플러스 멤버십': {
     name: '네이버 플러스 멤버십',
@@ -256,6 +290,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     plans: [{ name: '월간', price: 4900, cycle: 'monthly' }],
     familyPlan: null,
     note: '네이버페이 적립, 티빙/지니뮤직 혜택 선택',
+    cancellationUrl: 'https://nid.naver.com/membership/my',
+    brandColor: '#03C75A',
   },
   '배달의민족 배민클럽': {
     name: '배달의민족 배민클럽',
@@ -264,6 +300,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     plans: [{ name: '월간', price: 4990, cycle: 'monthly' }],
     familyPlan: null,
     note: '무료배달 및 할인 혜택',
+    cancellationUrl: 'https://member.baemin.com',
+    brandColor: '#2AC1BC',
   },
   'SSG 멤버십': {
     name: 'SSG 멤버십',
@@ -272,6 +310,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     plans: [{ name: '월간', price: 4900, cycle: 'monthly' }],
     familyPlan: null,
     note: '이마트/SSG 할인 혜택',
+    cancellationUrl: 'https://m.ssg.com/myssg/main.ssg',
+    brandColor: '#FF5A2E',
   },
   '마켓컬리 컬리패스': {
     name: '마켓컬리 컬리패스',
@@ -280,6 +320,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     plans: [{ name: '월간', price: 4900, cycle: 'monthly' }],
     familyPlan: null,
     note: '무료배송 및 적립 혜택',
+    cancellationUrl: 'https://www.kurly.com/mypage',
+    brandColor: '#5F0080',
   },
 
   /* ── 생산성 ──────────────────────────────────────────────── */
@@ -298,6 +340,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 6,
     },
     note: 'OneDrive 1TB 포함',
+    cancellationUrl: 'https://account.microsoft.com/services',
+    brandColor: '#D83B01',
   },
   노션: {
     name: '노션',
@@ -309,6 +353,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     ],
     familyPlan: null,
     note: '무료 플랜도 개인용으로 충분',
+    cancellationUrl: 'https://www.notion.so/my-account/plans',
+    brandColor: '#000000',
   },
   ChatGPT: {
     name: 'ChatGPT',
@@ -320,6 +366,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     ],
     familyPlan: null,
     note: 'GPT-4o 등 고성능 모델 사용',
+    cancellationUrl: 'https://chat.openai.com/settings/subscription',
+    brandColor: '#10A37F',
   },
   Canva: {
     name: 'Canva',
@@ -336,6 +384,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 5,
     },
     note: '디자인 템플릿 및 AI 기능',
+    cancellationUrl: 'https://www.canva.com/settings/billing',
+    brandColor: '#00C4CC',
   },
   피그마: {
     name: '피그마',
@@ -347,6 +397,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     ],
     familyPlan: null,
     note: '무료 플랜 3프로젝트 제한',
+    cancellationUrl: 'https://www.figma.com/settings',
+    brandColor: '#F24E1E',
   },
 
   /* ── 클라우드 ────────────────────────────────────────────── */
@@ -368,6 +420,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 6,
     },
     note: 'Apple 기기 백업 필수',
+    cancellationUrl: 'https://support.apple.com/ko-kr/108052',
+    brandColor: '#3693F3',
   },
   'Google One': {
     name: 'Google One',
@@ -385,6 +439,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 6,
     },
     note: 'Google 포토/Gmail/드라이브 통합',
+    cancellationUrl: 'https://one.google.com/settings',
+    brandColor: '#4285F4',
   },
   Dropbox: {
     name: 'Dropbox',
@@ -400,6 +456,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       cycle: 'monthly',
       maxMembers: 6,
     },
+    cancellationUrl: 'https://www.dropbox.com/account/plan',
+    brandColor: '#0061FF',
   },
 
   /* ── 게임 ────────────────────────────────────────────────── */
@@ -419,6 +477,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       maxMembers: 8,
     },
     note: '패밀리 8인까지 공유 가능',
+    cancellationUrl: 'https://ec.nintendo.com/my/membership',
+    brandColor: '#E60012',
   },
   'PlayStation Plus': {
     name: 'PlayStation Plus',
@@ -431,6 +491,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
       { name: 'Premium 연간', price: 139900, cycle: 'yearly' },
     ],
     familyPlan: null,
+    cancellationUrl: 'https://store.playstation.com/ko-kr/latest',
+    brandColor: '#003791',
   },
   'Xbox Game Pass': {
     name: 'Xbox Game Pass',
@@ -443,6 +505,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     ],
     familyPlan: null,
     note: 'PC + Console 통합',
+    cancellationUrl: 'https://account.microsoft.com/services',
+    brandColor: '#107C10',
   },
 
   /* ── 독서 ────────────────────────────────────────────────── */
@@ -456,6 +520,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     ],
     familyPlan: null,
     note: '전자책 무제한 읽기',
+    cancellationUrl: 'https://www.millie.co.kr/v3/mypage/subscription',
+    brandColor: '#FFCE00',
   },
   리디셀렉트: {
     name: '리디셀렉트',
@@ -464,6 +530,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     plans: [{ name: '기본', price: 9900, cycle: 'monthly' }],
     familyPlan: null,
     note: '전자책/웹소설/만화 구독',
+    cancellationUrl: 'https://ridibooks.com/account/membership',
+    brandColor: '#1F8CE6',
   },
   '윌라': {
     name: '윌라',
@@ -475,6 +543,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     ],
     familyPlan: null,
     note: '오디오북 전문',
+    cancellationUrl: 'https://www.welaaa.com/mypage',
+    brandColor: '#6C63FF',
   },
   'YES24 북클럽': {
     name: 'YES24 북클럽',
@@ -483,6 +553,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     plans: [{ name: '기본', price: 9500, cycle: 'monthly' }],
     familyPlan: null,
     note: '전자책 무제한 구독',
+    cancellationUrl: 'https://bookclub.yes24.com/MyRoom',
+    brandColor: '#D51921',
   },
   'Kindle Unlimited': {
     name: 'Kindle Unlimited',
@@ -491,6 +563,8 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     plans: [{ name: '기본', price: 11900, cycle: 'monthly' }],
     familyPlan: null,
     note: 'Amazon 전자책 구독',
+    cancellationUrl: 'https://www.amazon.co.kr/kindle-dbs/hz/subscribe/ku',
+    brandColor: '#FF9900',
   },
 };
 

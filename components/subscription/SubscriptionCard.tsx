@@ -21,11 +21,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { CategoryBadge } from './CategoryBadge';
+import { BrandIcon } from './BrandIcon';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import type { Subscription } from '@/lib/types/subscription';
 import { formatKRW } from '@/lib/utils/formatCurrency';
 import { CATEGORY_COLORS } from '@/lib/types/subscription';
-import { MoreVertical, Edit, Trash2, Calendar } from 'lucide-react';
+import { getServicePreset } from '@/lib/constants/servicePresets';
+import { MoreVertical, Edit, Trash2, Calendar, ExternalLink } from 'lucide-react';
 
 interface SubscriptionCardProps {
   subscription: Subscription;
@@ -38,6 +40,7 @@ export function SubscriptionCard({
 }: SubscriptionCardProps) {
   const { deleteSubscription } = useSubscriptionStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const preset = getServicePreset(subscription.name);
 
   const handleDelete = () => {
     deleteSubscription(subscription.id);
@@ -65,20 +68,14 @@ export function SubscriptionCard({
 
   return (
     <>
-      <Card
-        className="group hover:shadow-md transition-shadow"
-        style={{
-          borderLeftWidth: '4px',
-          borderLeftColor: CATEGORY_COLORS[subscription.category],
-        }}
-      >
-        <CardContent className="p-4">
+      <Card className="group hover:shadow-md transition-all duration-200 rounded-2xl border-border">
+        <CardContent className="p-5">
           <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 flex-1">
-              <div className="text-3xl">{subscription.icon}</div>
+            <div className="flex items-start gap-4 flex-1">
+              <BrandIcon name={subscription.name} icon={subscription.icon} size="md" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-lg truncate">
+                  <h3 className="font-bold text-xl truncate text-foreground">
                     {subscription.name}
                   </h3>
                   <div
@@ -87,13 +84,13 @@ export function SubscriptionCard({
                   />
                 </div>
                 {subscription.planName && (
-                  <p className="text-sm text-muted-foreground mb-2">
+                  <p className="text-sm text-muted-foreground mb-3 font-medium">
                     {subscription.planName}
                   </p>
                 )}
                 <div className="flex flex-wrap items-center gap-2">
                   <CategoryBadge category={subscription.category} />
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-xs rounded-lg">
                     <Calendar className="mr-1 h-3 w-3" />
                     매월 {subscription.billingDay}일
                   </Badge>
@@ -103,8 +100,10 @@ export function SubscriptionCard({
 
             <div className="flex items-start gap-2">
               <div className="text-right">
-                <div className="font-bold text-lg">{monthlyDisplay}</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="font-bold text-2xl text-foreground">
+                  {monthlyDisplay}
+                </div>
+                <div className="text-xs text-muted-foreground font-medium mt-1">
                   {subscription.billingCycle === 'monthly' ? '월간' : '연간'}
                 </div>
               </div>
@@ -114,16 +113,24 @@ export function SubscriptionCard({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
                   >
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="rounded-xl">
                   <DropdownMenuItem onClick={() => onEdit(subscription)}>
                     <Edit className="mr-2 h-4 w-4" />
                     수정
                   </DropdownMenuItem>
+                  {preset?.cancellationUrl && (
+                    <DropdownMenuItem
+                      onClick={() => window.open(preset.cancellationUrl, '_blank')}
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      해지 페이지 이동
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     className="text-destructive"
                     onClick={() => setShowDeleteDialog(true)}
@@ -137,7 +144,7 @@ export function SubscriptionCard({
           </div>
 
           {subscription.memo && (
-            <p className="mt-3 text-sm text-muted-foreground border-t pt-3">
+            <p className="mt-4 text-sm text-muted-foreground border-t border-border pt-4 font-medium">
               {subscription.memo}
             </p>
           )}
@@ -145,17 +152,21 @@ export function SubscriptionCard({
       </Card>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>구독을 삭제하시겠습니까?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-xl font-bold">
+              구독을 삭제하시겠습니까?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
               {subscription.name} 구독을 삭제하면 관련 데이터가 모두 삭제됩니다.
               이 작업은 되돌릴 수 없습니다.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>삭제</AlertDialogAction>
+            <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="rounded-xl">
+              삭제
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
