@@ -160,6 +160,21 @@ export function SubscriptionTimeline() {
       };
     });
 
+    // Calculate cumulative spending across all months (oldest to newest)
+    // Each month's spending = monthlyTotal for that month
+    const reversedGroups = [...groups].reverse(); // oldest first
+    let cumulativeTotal = 0;
+    const cumulativeMap = new Map<string, number>();
+    for (const group of reversedGroups) {
+      cumulativeTotal += group.monthlyTotal;
+      cumulativeMap.set(group.key, Math.round(cumulativeTotal * 100) / 100);
+    }
+    // Attach cumulative to groups
+    for (const group of groups) {
+      (group as MonthGroup & { cumulativeSpent: number }).cumulativeSpent =
+        cumulativeMap.get(group.key) || 0;
+    }
+
     return groups;
   }, [subscriptions, cancelledSubscriptions]);
 
@@ -193,16 +208,21 @@ export function SubscriptionTimeline() {
       <div className="relative">
         {monthGroups.map((group, groupIdx) => (
           <div key={group.key} className="mb-8 last:mb-0">
-            {/* Month header with subtotal */}
+            {/* Month header with subtotal + cumulative */}
             <div className="flex items-center gap-3 mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-primary shrink-0" />
                 <h4 className="text-sm font-extrabold text-foreground">{group.label}</h4>
               </div>
               <div className="flex-1 h-px bg-border" />
-              <span className="text-xs font-bold text-primary bg-primary/[0.06] px-3 py-1 rounded-full whitespace-nowrap">
-                월 {formatKRW(group.monthlyTotal)}
-              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-xs font-bold text-primary bg-primary/[0.06] px-3 py-1 rounded-full whitespace-nowrap">
+                  월 {formatKRW(group.monthlyTotal)}
+                </span>
+                <span className="text-[10px] font-bold text-muted-foreground bg-accent px-2 py-1 rounded-full whitespace-nowrap">
+                  누적 {formatKRW((group as MonthGroup & { cumulativeSpent: number }).cumulativeSpent || 0)}
+                </span>
+              </div>
             </div>
 
             {/* Events with vertical line */}
@@ -282,7 +302,7 @@ export function SubscriptionTimeline() {
       {/* Summary */}
       <div className="rounded-2xl bg-card border border-border p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
         <h4 className="text-xs font-bold text-muted-foreground tracking-wide uppercase mb-4">타임라인 요약</h4>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-4">
           <div>
             <div className="text-xs text-muted-foreground font-semibold mb-1">총 이벤트</div>
             <div className="text-3xl font-extrabold text-foreground tracking-tight">
@@ -299,6 +319,16 @@ export function SubscriptionTimeline() {
             <div className="text-xs text-muted-foreground font-semibold mb-1">해지</div>
             <div className="text-3xl font-extrabold tracking-tight" style={{ color: '#F04452' }}>
               {allEvents.filter((e) => e.type === 'cancelled').length}건
+            </div>
+          </div>
+          <div>
+            <div className="text-xs text-muted-foreground font-semibold mb-1">누적 지출</div>
+            <div className="text-3xl font-extrabold tracking-tight" style={{ color: '#3182F6' }}>
+              {formatKRW(
+                monthGroups.length > 0
+                  ? (monthGroups[0] as MonthGroup & { cumulativeSpent: number }).cumulativeSpent || 0
+                  : 0,
+              )}
             </div>
           </div>
         </div>

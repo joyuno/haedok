@@ -6,6 +6,10 @@ import { formatKRW } from '@/lib/utils/formatCurrency';
 import { CATEGORY_LABELS, type SubscriptionCategory } from '@/lib/types/subscription';
 import type { Subscription } from '@/lib/types/subscription';
 import { BrandIcon } from '@/components/subscription/BrandIcon';
+import { SERVICE_PRESETS } from '@/lib/constants/servicePresets';
+import { findSharingOpportunities } from '@/lib/calculations/sharingOptimize';
+import { analyzeBundleOptimization } from '@/lib/calculations/bundleOptimize';
+import { findMatchingEvents } from '@/lib/constants/discountEvents';
 import {
   AreaChart,
   Area,
@@ -153,7 +157,27 @@ export function PatternPredictor() {
       growthConfidence = 'high';
     }
 
-    // ── 4. Savings potential ──
+    // ── 3.5 Exchange rate risk for USD subscriptions ──
+    const usdSubscriptions = activeSubscriptions.filter((sub) => {
+      const preset = SERVICE_PRESETS[sub.name];
+      if (!preset) return false;
+      const currentPlan = preset.plans.find(
+        (p) =>
+          (p.cycle === 'yearly' ? Math.round(p.price / 12) : p.price) === sub.monthlyPrice ||
+          p.price === sub.price,
+      );
+      return currentPlan?.currency === 'USD' || preset.plans.some((p) => p.currency === 'USD');
+    });
+    const hasUsdSubscriptions = usdSubscriptions.length > 0;
+    // Approximate USD exposure: count subs whose names imply foreign service
+    const foreignServiceNames = ['넷플릭스', '디즈니+', '스포티파이', 'Apple Music', 'Apple TV+', 'ChatGPT', 'Canva', '피그마', 'Dropbox', 'Amazon Prime', 'YouTube Music'];
+    const foreignSubs = activeSubscriptions.filter((sub) =>
+      foreignServiceNames.some((name) => sub.name.includes(name) || name.includes(sub.name)),
+    );
+    const foreignExposure = foreignSubs.reduce((sum, s) => sum + s.monthlyPrice, 0);
+    const exchangeRateRisk = foreignExposure > 0 ? Math.round(foreignExposure * 0.05) : 0; // 5% volatility assumption
+
+    // ── 4. Savings potential (detailed: bundle/discount/sharing) ──
     // Find subs that might be worth cancelling: lowest monthlyPrice, or duplicates in same category
     const categoryGroups: Record<string, Subscription[]> = {};
     for (const sub of activeSubscriptions) {
@@ -170,10 +194,37 @@ export function PatternPredictor() {
       }
     }
 
+    // Detailed savings breakdown
+    const bundleOptimizations = analyzeBundleOptimization(activeSubscriptions);
+    const bundleSavings = bundleOptimizations.reduce((s, o) => s + o.monthlySavings, 0);
+
+    const sharingOpps = findSharingOpportunities(activeSubscriptions);
+    const sharingSavings = sharingOpps.reduce((s, o) => s + o.savingsPerPerson, 0);
+
+    const serviceNames = activeSubscriptions.map((sub) => sub.name);
+    const matchingEvents = findMatchingEvents(serviceNames);
+    const cardDiscountEvents = matchingEvents.filter((e) => e.type === 'card');
+    let discountSavings = 0;
+    for (const event of cardDiscountEvents) {
+      for (const sub of activeSubscriptions) {
+        const matches = event.targetServices.some(
+          (t) => sub.name.includes(t) || t.includes(sub.name),
+        );
+        if (!matches) continue;
+        if (event.discountAmount) {
+          discountSavings += Math.min(event.discountAmount, sub.monthlyPrice);
+        } else if (event.discountPercent) {
+          discountSavings += Math.round((sub.monthlyPrice * event.discountPercent) / 100);
+        }
+        break; // one event per sub for estimation
+      }
+    }
+
     const savingsPotential = cancelCandidates.reduce((sum, s) => sum + s.monthlyPrice, 0);
+    const totalDetailedSavings = bundleSavings + sharingSavings + discountSavings + savingsPotential;
     const savingsScore = Math.min(
       100,
-      Math.round((savingsPotential / Math.max(currentMonthlyCost, 1)) * 100),
+      Math.round((totalDetailedSavings / Math.max(currentMonthlyCost, 1)) * 100),
     );
 
     // ── 5. Top 3 most important subscriptions ──
@@ -208,21 +259,31 @@ export function PatternPredictor() {
         value: formatKRW(predictedNextMonth),
         description:
           trialEndingSubs.length > 0
-            ? `무료체험 종료 ${trialEndingSubs.length}건 포함 (+${formatKRW(trialEndingCost)})`
-            : '현재와 동일한 수준 예상',
-        confidence: trialEndingSubs.length > 0 ? 'high' : 'medium',
+            ? `무료체험 종료 ${trialEndingSubs.length}건 포함 (+${formatKRW(trialEndingCost)})` +
+              (foreignSubs.length > 0 ? ` | USD 결제 ${foreignSubs.length}건 환율 변동 리스크 ~${formatKRW(exchangeRateRisk)}` : '')
+            : foreignSubs.length > 0
+              ? `USD 결제 ${foreignSubs.length}건 존재 (환율 변동 시 ~${formatKRW(exchangeRateRisk)} 변동 가능)`
+              : '현재와 동일한 수준 예상',
+        confidence: trialEndingSubs.length > 0 ? 'high' : foreignSubs.length > 0 ? 'medium' : 'medium',
         icon: '💰',
         color: '#3182F6',
       },
       {
         id: 'savings',
         title: '절약 가능성',
-        value: savingsPotential > 0 ? formatKRW(savingsPotential) : '없음',
+        value: totalDetailedSavings > 0 ? formatKRW(totalDetailedSavings) : '없음',
         description:
-          cancelCandidates.length > 0
-            ? `동일 카테고리 중복 ${cancelCandidates.length}건 정리 가능`
+          totalDetailedSavings > 0
+            ? [
+                bundleSavings > 0 ? `번들 ${formatKRW(bundleSavings)}` : '',
+                sharingSavings > 0 ? `공유 ${formatKRW(sharingSavings)}` : '',
+                discountSavings > 0 ? `할인 ${formatKRW(discountSavings)}` : '',
+                savingsPotential > 0 ? `중복정리 ${formatKRW(savingsPotential)}` : '',
+              ]
+                .filter(Boolean)
+                .join(' + ')
             : '중복 구독이 없어요. 잘 관리하고 계시네요!',
-        confidence: cancelCandidates.length > 0 ? 'high' : 'low',
+        confidence: totalDetailedSavings > 0 ? 'high' : 'low',
         icon: '✂️',
         color: '#1FC08E',
       },
@@ -235,6 +296,11 @@ export function PatternPredictor() {
       savingsScore,
       cancelCandidates,
       predictedNextMonth,
+      foreignSubs,
+      exchangeRateRisk,
+      bundleSavings,
+      sharingSavings,
+      discountSavings,
     };
   }, [activeSubscriptions, subscriptions, cancelledSubscriptions, currentMonthlyCost, getActiveSubscriptions, getTotalMonthlyCost]);
 
@@ -394,6 +460,31 @@ export function PatternPredictor() {
           })}
         </div>
       </div>
+
+      {/* Exchange Rate Risk Warning */}
+      {analysis.foreignSubs.length > 0 && (
+        <div className="rounded-2xl bg-[#3182F6]/[0.04] border border-[#3182F6]/10 p-6">
+          <h4 className="text-xs font-bold text-[#3182F6] tracking-wide uppercase mb-3">
+            USD 결제 환율 변동 리스크
+          </h4>
+          <p className="text-xs text-muted-foreground font-medium mb-3">
+            원/달러 환율 변동 시 월 구독료가 ~{formatKRW(analysis.exchangeRateRisk)} 변동할 수 있어요
+          </p>
+          <div className="space-y-2">
+            {analysis.foreignSubs.map((sub: Subscription) => (
+              <div key={sub.id} className="flex items-center justify-between p-3 rounded-xl bg-card/60">
+                <div className="flex items-center gap-2.5">
+                  <BrandIcon name={sub.name} icon={sub.icon} size="sm" />
+                  <span className="text-sm font-semibold text-foreground">{sub.name}</span>
+                </div>
+                <span className="text-xs font-bold text-[#3182F6] tabular-nums">
+                  {formatKRW(sub.monthlyPrice)}/월
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Cancel Candidates */}
       {analysis.cancelCandidates.length > 0 && (

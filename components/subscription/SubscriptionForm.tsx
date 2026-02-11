@@ -25,6 +25,7 @@ import {
 } from '@/lib/types/subscription';
 import type { ServicePreset } from '@/lib/constants/servicePresets';
 import { formatKRW } from '@/lib/utils/formatCurrency';
+import { getUSDtoKRW, convertUSDtoKRW, formatExchangeInfo } from '@/lib/utils/exchangeRate';
 import { Users, User } from 'lucide-react';
 
 interface SubscriptionFormProps {
@@ -73,6 +74,18 @@ export function SubscriptionForm({
   const [maxMembers, setMaxMembers] = useState(4);
   const [familyPlanFullPrice, setFamilyPlanFullPrice] = useState(0);
 
+  // Exchange rate state
+  const [exchangeRate, setExchangeRate] = useState<number>(1450);
+  const [selectedCurrency, setSelectedCurrency] = useState<'KRW' | 'USD'>('KRW');
+  const [usdPrice, setUsdPrice] = useState<number>(0);
+
+  // Fetch exchange rate on mount
+  useEffect(() => {
+    getUSDtoKRW().then((rate) => {
+      setExchangeRate(rate);
+    });
+  }, []);
+
   const splitPrice = useMemo(() => {
     if (!isFamilyPlan || sharingMode !== 'split' || memberCount <= 0) return 0;
     return Math.ceil(familyPlanFullPrice / memberCount);
@@ -96,20 +109,43 @@ export function SubscriptionForm({
     setIcon(preset.icon);
     setIsFamilyPlan(false);
     setSharingMode('solo');
+    setSelectedCurrency('KRW');
+    setUsdPrice(0);
     setActiveTab('custom');
   };
 
   const handleFamilyPlanSelect = (preset: ServicePreset) => {
     if (!preset.familyPlan) return;
     const fp = preset.familyPlan;
+    const fpCurrency = fp.currency || 'KRW';
     setPlanName(fp.name);
-    setFamilyPlanFullPrice(fp.price);
     setBillingCycle(fp.cycle);
     setMaxMembers(fp.maxMembers);
     setMemberCount(fp.maxMembers);
     setIsFamilyPlan(true);
     setSharingMode('solo');
-    setPrice(fp.price.toString());
+    setSelectedCurrency(fpCurrency);
+
+    if (fpCurrency === 'USD') {
+      const krwConverted = Math.round(convertUSDtoKRW(fp.price, exchangeRate));
+      setUsdPrice(fp.price);
+      setFamilyPlanFullPrice(krwConverted);
+      setPrice(krwConverted.toString());
+    } else {
+      setUsdPrice(0);
+      setFamilyPlanFullPrice(fp.price);
+      setPrice(fp.price.toString());
+    }
+  };
+
+  /** Format price display for a plan button */
+  const formatPlanPrice = (planPrice: number, currency: 'KRW' | 'USD' | undefined, cycle: BillingCycle) => {
+    const cycleLabel = cycle === 'monthly' ? '월' : '년';
+    if (currency === 'USD') {
+      const krwConverted = Math.round(convertUSDtoKRW(planPrice, exchangeRate));
+      return `$${planPrice.toFixed(2)} (${formatKRW(krwConverted)}) / ${cycleLabel}`;
+    }
+    return `${formatKRW(planPrice)} / ${cycleLabel}`;
   };
 
   useEffect(() => {
@@ -235,26 +271,37 @@ export function SubscriptionForm({
             <div className="space-y-2">
               <Label>요금제 선택</Label>
               <div className="grid gap-2">
-                {selectedPreset.plans.map((plan) => (
-                  <Button
-                    key={plan.name}
-                    type="button"
-                    variant="outline"
-                    className="justify-between"
-                    onClick={() => {
-                      setPlanName(plan.name);
-                      setPrice(plan.price.toString());
-                      setBillingCycle(plan.cycle);
-                      setIsFamilyPlan(false);
-                    }}
-                  >
-                    <span>{plan.name}</span>
-                    <span className="text-muted-foreground">
-                      {formatKRW(plan.price)} /{' '}
-                      {plan.cycle === 'monthly' ? '월' : '년'}
-                    </span>
-                  </Button>
-                ))}
+                {selectedPreset.plans.map((plan) => {
+                  const planCurrency = plan.currency || 'KRW';
+                  return (
+                    <Button
+                      key={plan.name}
+                      type="button"
+                      variant="outline"
+                      className="justify-between"
+                      onClick={() => {
+                        setPlanName(plan.name);
+                        setBillingCycle(plan.cycle);
+                        setIsFamilyPlan(false);
+                        setSelectedCurrency(planCurrency);
+
+                        if (planCurrency === 'USD') {
+                          const krwConverted = Math.round(convertUSDtoKRW(plan.price, exchangeRate));
+                          setUsdPrice(plan.price);
+                          setPrice(krwConverted.toString());
+                        } else {
+                          setUsdPrice(0);
+                          setPrice(plan.price.toString());
+                        }
+                      }}
+                    >
+                      <span>{plan.name}</span>
+                      <span className="text-muted-foreground">
+                        {formatPlanPrice(plan.price, planCurrency, plan.cycle)}
+                      </span>
+                    </Button>
+                  );
+                })}
                 {selectedPreset.familyPlan && (
                   <Button
                     type="button"
@@ -268,14 +315,31 @@ export function SubscriptionForm({
                       {selectedPreset.familyPlan.maxMembers}인 공유)
                     </span>
                     <span className="text-muted-foreground">
-                      {formatKRW(selectedPreset.familyPlan.price)} /{' '}
-                      {selectedPreset.familyPlan.cycle === 'monthly'
-                        ? '월'
-                        : '년'}
+                      {formatPlanPrice(
+                        selectedPreset.familyPlan.price,
+                        selectedPreset.familyPlan.currency || 'KRW',
+                        selectedPreset.familyPlan.cycle,
+                      )}
                     </span>
                   </Button>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* USD Exchange Rate Info */}
+          {selectedCurrency === 'USD' && usdPrice > 0 && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-3 space-y-1">
+              <div className="flex items-center gap-2 text-sm font-medium text-blue-700 dark:text-blue-300">
+                <span>💱</span>
+                <span>달러 환율 적용</span>
+              </div>
+              <p className="text-sm text-blue-600 dark:text-blue-400">
+                {formatExchangeInfo(usdPrice, Math.round(convertUSDtoKRW(usdPrice, exchangeRate)), exchangeRate)}
+              </p>
+              <p className="text-xs text-blue-500 dark:text-blue-500">
+                환율: 1 USD = {exchangeRate.toLocaleString('ko-KR', { maximumFractionDigits: 2 })}원 (24시간 캐시)
+              </p>
             </div>
           )}
 
@@ -367,6 +431,11 @@ export function SubscriptionForm({
               {isFamilyPlan && sharingMode === 'split' && (
                 <p className="text-xs text-muted-foreground">
                   자동 계산됨 (N빵)
+                </p>
+              )}
+              {selectedCurrency === 'USD' && usdPrice > 0 && !isFamilyPlan && (
+                <p className="text-xs text-muted-foreground">
+                  환율 자동 적용됨 (${usdPrice.toFixed(2)})
                 </p>
               )}
             </div>

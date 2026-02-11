@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { formatKRW } from '@/lib/utils/formatCurrency';
 import { CATEGORY_LABELS, CATEGORY_COLORS, type SubscriptionCategory } from '@/lib/types/subscription';
+import { generateSavingsReport } from '@/lib/calculations/savingsAnalysis';
 import {
   RadarChart,
   Radar,
@@ -144,7 +145,22 @@ export function OptimalPortfolio() {
     const totalDiffAbs = diffs.reduce((sum, d) => sum + Math.abs(d.diff), 0);
     const balanceScore = Math.max(0, Math.round(100 - totalDiffAbs));
 
-    return { diffs, radarData, adviceList, balanceScore };
+    // Savings analysis for portfolio comparison
+    const savingsReport = generateSavingsReport(activeSubscriptions);
+    const currentYearlyCost = totalCost * 12;
+    const optimizedYearlyCost = Math.max(0, currentYearlyCost - savingsReport.yearlySavings);
+    const optimizedMonthlyCost = Math.round(optimizedYearlyCost / 12);
+
+    return {
+      diffs,
+      radarData,
+      adviceList,
+      balanceScore,
+      savingsReport,
+      currentYearlyCost,
+      optimizedYearlyCost,
+      optimizedMonthlyCost,
+    };
   }, [activeSubscriptions, totalCost]);
 
   if (activeSubscriptions.length === 0) {
@@ -285,6 +301,39 @@ export function OptimalPortfolio() {
           ))}
         </div>
       </div>
+
+      {/* Annual Cost Comparison: Current vs Optimized */}
+      {analysis.savingsReport.monthlySavings > 0 && (
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+          <h4 className="text-sm font-bold text-foreground mb-4">현재 vs 최적화 포트폴리오</h4>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="rounded-xl bg-accent/40 p-4 text-center">
+              <div className="text-xs text-muted-foreground font-semibold mb-1">현재 연간 비용</div>
+              <div className="text-2xl font-extrabold text-foreground tabular-nums">
+                {formatKRW(analysis.currentYearlyCost)}
+              </div>
+              <div className="text-xs text-muted-foreground font-medium mt-0.5">
+                월 {formatKRW(totalCost)}
+              </div>
+            </div>
+            <div className="rounded-xl bg-[#1FC08E]/[0.06] p-4 text-center">
+              <div className="text-xs text-[#1FC08E] font-semibold mb-1">최적화 시 연간 비용</div>
+              <div className="text-2xl font-extrabold tabular-nums" style={{ color: '#1FC08E' }}>
+                {formatKRW(analysis.optimizedYearlyCost)}
+              </div>
+              <div className="text-xs text-muted-foreground font-medium mt-0.5">
+                월 {formatKRW(analysis.optimizedMonthlyCost)}
+              </div>
+            </div>
+          </div>
+          <div className="rounded-xl bg-primary/[0.04] p-3 text-center">
+            <span className="text-xs text-muted-foreground font-medium">절약 시 투자 수익 (5년, S&P500 기준): </span>
+            <span className="text-sm font-extrabold" style={{ color: '#1FC08E' }}>
+              {formatKRW(Math.round(analysis.savingsReport.investmentSimulation.sp500Return5Y))}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Category Breakdown Table */}
       <div className="rounded-2xl border border-border bg-card p-6">

@@ -4,6 +4,7 @@ export interface ServicePlan {
   name: string;
   price: number;
   cycle: BillingCycle;
+  currency?: 'KRW' | 'USD'; // default: 'KRW'
 }
 
 export interface FamilyPlan {
@@ -11,6 +12,7 @@ export interface FamilyPlan {
   price: number;
   cycle: BillingCycle;
   maxMembers: number;
+  currency?: 'KRW' | 'USD';
 }
 
 export interface ServicePreset {
@@ -48,6 +50,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.netflix.com/cancelplan',
     brandColor: '#E50914',
     domain: 'netflix.com',
+    logoUrl: 'https://logo.clearbit.com/netflix.com',
   },
   '디즈니+': {
     name: '디즈니+',
@@ -68,6 +71,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.disneyplus.com/account',
     brandColor: '#113CCF',
     domain: 'disneyplus.com',
+    logoUrl: 'https://logo.clearbit.com/disneyplus.com',
   },
   웨이브: {
     name: '웨이브',
@@ -109,6 +113,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.tving.com/my',
     brandColor: '#FF0558',
     domain: 'tving.com',
+    logoUrl: 'https://icon.horse/icon/tving.com?size=large',
   },
   쿠팡플레이: {
     name: '쿠팡플레이',
@@ -120,6 +125,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.coupang.com/np/coupangPlay',
     brandColor: '#E6282E',
     domain: 'coupangplay.com',
+    logoUrl: 'https://icon.horse/icon/coupangplay.com?size=large',
   },
   왓챠: {
     name: '왓챠',
@@ -139,6 +145,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://watcha.com/settings/account',
     brandColor: '#FF0558',
     domain: 'watcha.com',
+    logoUrl: 'https://icon.horse/icon/watcha.com?size=large',
   },
   'Apple TV+': {
     name: 'Apple TV+',
@@ -158,6 +165,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://support.apple.com/ko-kr/111771',
     brandColor: '#000000',
     domain: 'tv.apple.com',
+    logoUrl: 'https://logo.clearbit.com/apple.com',
   },
   'Amazon Prime': {
     name: 'Amazon Prime',
@@ -171,6 +179,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.amazon.co.kr/gp/primecentral',
     brandColor: '#00A8E1',
     domain: 'primevideo.com',
+    logoUrl: 'https://logo.clearbit.com/amazon.com',
   },
   유튜브프리미엄: {
     name: '유튜브 프리미엄',
@@ -190,6 +199,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.youtube.com/paid_memberships',
     brandColor: '#FF0000',
     domain: 'youtube.com',
+    logoUrl: 'https://logo.clearbit.com/youtube.com',
   },
 
   /* ── 음악 ────────────────────────────────────────────────── */
@@ -211,6 +221,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.spotify.com/account/subscription/',
     brandColor: '#1DB954',
     domain: 'spotify.com',
+    logoUrl: 'https://logo.clearbit.com/spotify.com',
   },
   'Apple Music': {
     name: 'Apple Music',
@@ -231,6 +242,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://support.apple.com/ko-kr/108380',
     brandColor: '#FA2D48',
     domain: 'music.apple.com',
+    logoUrl: 'https://logo.clearbit.com/apple.com',
   },
   '지니뮤직': {
     name: '지니뮤직',
@@ -292,6 +304,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.youtube.com/paid_memberships',
     brandColor: '#FF0000',
     domain: 'music.youtube.com',
+    logoUrl: 'https://logo.clearbit.com/youtube.com',
   },
 
   /* ── 쇼핑/배달 ──────────────────────────────────────────── */
@@ -305,6 +318,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.coupang.com/np/coupangPlay',
     brandColor: '#E6282E',
     domain: 'coupang.com',
+    logoUrl: 'https://icon.horse/icon/coupang.com?size=large',
   },
   '네이버 플러스': {
     name: '네이버 플러스',
@@ -316,6 +330,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://nid.naver.com/membership/my',
     brandColor: '#03C75A',
     domain: 'naver.com',
+    logoUrl: 'https://icon.horse/icon/naver.com?size=large',
   },
   '배민클럽': {
     name: '배민클럽',
@@ -327,6 +342,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://member.baemin.com',
     brandColor: '#2AC1BC',
     domain: 'baemin.com',
+    logoUrl: 'https://icon.horse/icon/baemin.com?size=large',
   },
   'SSG 멤버십': {
     name: 'SSG 멤버십',
@@ -338,6 +354,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://m.ssg.com/myssg/main.ssg',
     brandColor: '#FF5A2E',
     domain: 'ssg.com',
+    logoUrl: 'https://icon.horse/icon/ssg.com?size=large',
   },
   '컬리패스': {
     name: '컬리패스',
@@ -349,6 +366,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.kurly.com/mypage',
     brandColor: '#5F0080',
     domain: 'kurly.com',
+    logoUrl: 'https://icon.horse/icon/kurly.com?size=large',
   },
 
   /* ── 생산성 ──────────────────────────────────────────────── */
@@ -370,6 +388,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://account.microsoft.com/services',
     brandColor: '#D83B01',
     domain: 'microsoft.com',
+    logoUrl: 'https://logo.clearbit.com/microsoft.com',
   },
   노션: {
     name: '노션',
@@ -384,20 +403,122 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.notion.so/my-account/plans',
     brandColor: '#000000',
     domain: 'notion.so',
+    logoUrl: 'https://logo.clearbit.com/notion.so',
   },
   ChatGPT: {
     name: 'ChatGPT',
     category: 'productivity',
     icon: '🤖',
     plans: [
-      { name: 'Plus', price: 30000, cycle: 'monthly' },
-      { name: 'Pro', price: 300000, cycle: 'monthly' },
+      { name: 'Plus', price: 20, cycle: 'monthly', currency: 'USD' },
+      { name: 'Pro', price: 200, cycle: 'monthly', currency: 'USD' },
     ],
     familyPlan: null,
-    note: 'GPT-4o 등 고성능 모델 사용',
+    note: 'GPT-4o, o1 등 최신 모델 사용 ($20/월, 환율 적용)',
     cancellationUrl: 'https://chat.openai.com/settings/subscription',
     brandColor: '#10A37F',
     domain: 'openai.com',
+    logoUrl: 'https://logo.clearbit.com/openai.com',
+  },
+  'Claude Pro': {
+    name: 'Claude Pro',
+    category: 'productivity',
+    icon: '🧠',
+    plans: [
+      { name: 'Pro', price: 20, cycle: 'monthly', currency: 'USD' },
+      { name: 'Max (5x)', price: 100, cycle: 'monthly', currency: 'USD' },
+      { name: 'Max (20x)', price: 200, cycle: 'monthly', currency: 'USD' },
+    ],
+    familyPlan: null,
+    note: 'Claude 4 Opus/Sonnet 최신 AI 모델 ($20/월, 환율 적용)',
+    cancellationUrl: 'https://claude.ai/settings',
+    brandColor: '#D97757',
+    domain: 'claude.ai',
+  },
+  'Gemini Advanced': {
+    name: 'Gemini Advanced',
+    category: 'productivity',
+    icon: '✨',
+    plans: [
+      { name: 'Advanced (Google One AI)', price: 19.99, cycle: 'monthly', currency: 'USD' },
+    ],
+    familyPlan: null,
+    note: 'Gemini Ultra + Google One 2TB ($19.99/월, 환율 적용)',
+    cancellationUrl: 'https://one.google.com/settings',
+    brandColor: '#4285F4',
+    domain: 'gemini.google.com',
+  },
+  'Perplexity Pro': {
+    name: 'Perplexity Pro',
+    category: 'productivity',
+    icon: '🔎',
+    plans: [
+      { name: 'Pro 월간', price: 20, cycle: 'monthly', currency: 'USD' },
+      { name: 'Pro 연간', price: 200, cycle: 'yearly', currency: 'USD' },
+    ],
+    familyPlan: null,
+    note: 'AI 검색 무제한 Pro 모드 ($20/월, 환율 적용)',
+    cancellationUrl: 'https://www.perplexity.ai/settings/subscription',
+    brandColor: '#20808D',
+    domain: 'perplexity.ai',
+  },
+  'GitHub Copilot': {
+    name: 'GitHub Copilot',
+    category: 'productivity',
+    icon: '👨‍💻',
+    plans: [
+      { name: 'Individual', price: 10, cycle: 'monthly', currency: 'USD' },
+      { name: 'Individual 연간', price: 100, cycle: 'yearly', currency: 'USD' },
+      { name: 'Business', price: 19, cycle: 'monthly', currency: 'USD' },
+    ],
+    familyPlan: null,
+    note: 'AI 코딩 어시스턴트 ($10/월, 환율 적용)',
+    cancellationUrl: 'https://github.com/settings/copilot',
+    brandColor: '#000000',
+    domain: 'github.com',
+  },
+  'Cursor Pro': {
+    name: 'Cursor Pro',
+    category: 'productivity',
+    icon: '⌨️',
+    plans: [
+      { name: 'Pro', price: 20, cycle: 'monthly', currency: 'USD' },
+      { name: 'Business', price: 40, cycle: 'monthly', currency: 'USD' },
+    ],
+    familyPlan: null,
+    note: 'AI 코드 에디터 ($20/월, 환율 적용)',
+    cancellationUrl: 'https://www.cursor.com/settings',
+    brandColor: '#000000',
+    domain: 'cursor.com',
+  },
+  Midjourney: {
+    name: 'Midjourney',
+    category: 'productivity',
+    icon: '🎨',
+    plans: [
+      { name: 'Basic', price: 10, cycle: 'monthly', currency: 'USD' },
+      { name: 'Standard', price: 30, cycle: 'monthly', currency: 'USD' },
+      { name: 'Pro', price: 60, cycle: 'monthly', currency: 'USD' },
+    ],
+    familyPlan: null,
+    note: 'AI 이미지 생성 ($10/월~, 환율 적용)',
+    cancellationUrl: 'https://www.midjourney.com/account',
+    brandColor: '#000000',
+    domain: 'midjourney.com',
+  },
+  Grammarly: {
+    name: 'Grammarly',
+    category: 'productivity',
+    icon: '✍️',
+    plans: [
+      { name: 'Premium 월간', price: 12, cycle: 'monthly', currency: 'USD' },
+      { name: 'Premium 연간', price: 144, cycle: 'yearly', currency: 'USD' },
+    ],
+    familyPlan: null,
+    note: 'AI 영문법 교정 ($12/월, 환율 적용)',
+    cancellationUrl: 'https://account.grammarly.com/subscription',
+    brandColor: '#15C39A',
+    domain: 'grammarly.com',
   },
   Canva: {
     name: 'Canva',

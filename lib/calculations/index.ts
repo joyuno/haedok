@@ -7,3 +7,4 @@ export * from './costFeeling';
 export * from './opportunityCost';
 export * from './subscriptionDNA';
 export * from './bundleOptimize';
+export * from './savingsAnalysis';

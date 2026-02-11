@@ -11,10 +11,11 @@ import {
   RecommendationCard,
   BenchmarkComparison,
   CsvUploader,
+  SavingsReport,
 } from '@/components/analysis';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { useUsageStore } from '@/stores/usageStore';
-import { PackageOpen, TrendingUp, Upload } from 'lucide-react';
+import { PackageOpen, TrendingUp, Upload, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AnalysisPage() {
@@ -156,7 +157,7 @@ export default function AnalysisPage() {
       )}
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 rounded-xl p-1.5 bg-accent">
+        <TabsList className="grid w-full grid-cols-5 rounded-xl p-1.5 bg-accent">
           <TabsTrigger value="overview" className="rounded-lg font-semibold">
             개요
           </TabsTrigger>
@@ -171,6 +172,10 @@ export default function AnalysisPage() {
           </TabsTrigger>
           <TabsTrigger value="benchmark" className="rounded-lg font-semibold">
             평균 비교
+          </TabsTrigger>
+          <TabsTrigger value="savings" className="rounded-lg font-semibold">
+            <Sparkles className="mr-1 h-3.5 w-3.5" />
+            절약 보고서
           </TabsTrigger>
         </TabsList>
 
@@ -192,6 +197,10 @@ export default function AnalysisPage() {
 
         <TabsContent value="benchmark">
           <BenchmarkComparison analyses={roiAnalyses} />
+        </TabsContent>
+
+        <TabsContent value="savings">
+          <SavingsReport />
         </TabsContent>
       </Tabs>
     </div>
