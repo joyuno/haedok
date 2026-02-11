@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
 import { ServicePresets } from './ServicePresets';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import {
@@ -24,6 +25,7 @@ import {
 } from '@/lib/types/subscription';
 import type { ServicePreset } from '@/lib/constants/servicePresets';
 import { formatKRW } from '@/lib/utils/formatCurrency';
+import { Users, User } from 'lucide-react';
 
 interface SubscriptionFormProps {
   mode: 'add' | 'edit';
@@ -64,9 +66,26 @@ export function SubscriptionForm({
   );
   const [memo, setMemo] = useState(subscription?.memo || '');
 
+  // Family plan sharing state
+  const [isFamilyPlan, setIsFamilyPlan] = useState(false);
+  const [sharingMode, setSharingMode] = useState<'solo' | 'split'>('solo');
+  const [memberCount, setMemberCount] = useState(2);
+  const [maxMembers, setMaxMembers] = useState(4);
+  const [familyPlanFullPrice, setFamilyPlanFullPrice] = useState(0);
+
+  const splitPrice = useMemo(() => {
+    if (!isFamilyPlan || sharingMode !== 'split' || memberCount <= 0) return 0;
+    return Math.ceil(familyPlanFullPrice / memberCount);
+  }, [isFamilyPlan, sharingMode, memberCount, familyPlanFullPrice]);
+
   useEffect(() => {
     if (mode === 'edit' && subscription) {
       setActiveTab('custom');
+      if (subscription.isShared && subscription.sharedCount) {
+        setIsFamilyPlan(true);
+        setSharingMode('split');
+        setMemberCount(subscription.sharedCount);
+      }
     }
   }, [mode, subscription]);
 
@@ -75,8 +94,31 @@ export function SubscriptionForm({
     setName(preset.name);
     setCategory(preset.category);
     setIcon(preset.icon);
+    setIsFamilyPlan(false);
+    setSharingMode('solo');
     setActiveTab('custom');
   };
+
+  const handleFamilyPlanSelect = (preset: ServicePreset) => {
+    if (!preset.familyPlan) return;
+    const fp = preset.familyPlan;
+    setPlanName(fp.name);
+    setFamilyPlanFullPrice(fp.price);
+    setBillingCycle(fp.cycle);
+    setMaxMembers(fp.maxMembers);
+    setMemberCount(fp.maxMembers);
+    setIsFamilyPlan(true);
+    setSharingMode('solo');
+    setPrice(fp.price.toString());
+  };
+
+  useEffect(() => {
+    if (isFamilyPlan && sharingMode === 'split') {
+      setPrice(splitPrice.toString());
+    } else if (isFamilyPlan && sharingMode === 'solo') {
+      setPrice(familyPlanFullPrice.toString());
+    }
+  }, [isFamilyPlan, sharingMode, splitPrice, familyPlanFullPrice]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,6 +131,9 @@ export function SubscriptionForm({
       return;
     }
 
+    const isShared = isFamilyPlan && sharingMode === 'split';
+    const sharedCount = isShared ? memberCount : undefined;
+
     if (mode === 'add') {
       addSubscription({
         name,
@@ -98,6 +143,8 @@ export function SubscriptionForm({
         price: priceNum,
         billingDay: billingDayNum,
         status,
+        isShared,
+        sharedCount,
         memo: memo || undefined,
         planName: planName || undefined,
       });
@@ -110,6 +157,8 @@ export function SubscriptionForm({
         price: priceNum,
         billingDay: billingDayNum,
         status,
+        isShared,
+        sharedCount,
         memo: memo || undefined,
         planName: planName || undefined,
       });
@@ -121,7 +170,7 @@ export function SubscriptionForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {mode === 'add' && (
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'preset' | 'custom')}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="preset">인기 서비스 선택</TabsTrigger>
             <TabsTrigger value="custom">직접 입력</TabsTrigger>
@@ -204,6 +253,7 @@ export function SubscriptionForm({
                       setPlanName(plan.name);
                       setPrice(plan.price.toString());
                       setBillingCycle(plan.cycle);
+                      setIsFamilyPlan(false);
                     }}
                   >
                     <span>{plan.name}</span>
@@ -217,14 +267,11 @@ export function SubscriptionForm({
                   <Button
                     type="button"
                     variant="outline"
-                    className="justify-between border-primary"
-                    onClick={() => {
-                      setPlanName(selectedPreset.familyPlan!.name);
-                      setPrice(selectedPreset.familyPlan!.price.toString());
-                      setBillingCycle(selectedPreset.familyPlan!.cycle);
-                    }}
+                    className={`justify-between ${isFamilyPlan ? 'border-primary bg-primary/5' : 'border-primary'}`}
+                    onClick={() => handleFamilyPlanSelect(selectedPreset)}
                   >
-                    <span>
+                    <span className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
                       {selectedPreset.familyPlan.name} (
                       {selectedPreset.familyPlan.maxMembers}인 공유)
                     </span>
@@ -240,6 +287,78 @@ export function SubscriptionForm({
             </div>
           )}
 
+          {/* Family Plan Sharing Options */}
+          {isFamilyPlan && (
+            <div className="rounded-xl border-2 border-primary/20 bg-primary/5 p-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                <Label className="text-base font-semibold">가족 플랜 비용 분담</Label>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  variant={sharingMode === 'solo' ? 'default' : 'outline'}
+                  className="flex items-center gap-2 h-auto py-3"
+                  onClick={() => setSharingMode('solo')}
+                >
+                  <User className="h-4 w-4" />
+                  <div className="text-left">
+                    <div className="font-medium">혼자 부담</div>
+                    <div className="text-xs opacity-70">전체 금액을 내가 결제</div>
+                  </div>
+                </Button>
+                <Button
+                  type="button"
+                  variant={sharingMode === 'split' ? 'default' : 'outline'}
+                  className="flex items-center gap-2 h-auto py-3"
+                  onClick={() => setSharingMode('split')}
+                >
+                  <Users className="h-4 w-4" />
+                  <div className="text-left">
+                    <div className="font-medium">N빵</div>
+                    <div className="text-xs opacity-70">인원수로 나눠서 분담</div>
+                  </div>
+                </Button>
+              </div>
+
+              {sharingMode === 'split' && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">공유 인원</span>
+                    <span className="text-lg font-bold text-primary">{memberCount}명</span>
+                  </div>
+                  <Slider
+                    value={[memberCount]}
+                    onValueChange={(v) => setMemberCount(v[0])}
+                    min={2}
+                    max={maxMembers}
+                    step={1}
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>2명</span>
+                    <span>최대 {maxMembers}명</span>
+                  </div>
+
+                  <div className="rounded-lg bg-background p-3 space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">총 요금</span>
+                      <span>{formatKRW(familyPlanFullPrice)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">나누기</span>
+                      <span>{memberCount}명</span>
+                    </div>
+                    <div className="border-t pt-1 flex justify-between font-semibold">
+                      <span>내가 낼 금액</span>
+                      <span className="text-primary text-lg">{formatKRW(splitPrice)}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="price">가격 (원) *</Label>
@@ -251,7 +370,13 @@ export function SubscriptionForm({
                 placeholder="13500"
                 required
                 min="0"
+                disabled={isFamilyPlan && sharingMode === 'split'}
               />
+              {isFamilyPlan && sharingMode === 'split' && (
+                <p className="text-xs text-muted-foreground">
+                  자동 계산됨 (N빵)
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
