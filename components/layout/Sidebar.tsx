@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -32,9 +33,14 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const totalMonthlyCost = useSubscriptionStore((state) =>
     state.getTotalMonthlyCost(),
   );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -81,12 +87,12 @@ export function Sidebar() {
           onClick={toggleTheme}
           className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-muted-foreground hover:bg-accent hover:text-foreground font-medium transition-all duration-200"
         >
-          {theme === 'dark' ? (
+          {mounted && theme === 'dark' ? (
             <Sun className="w-5 h-5" />
           ) : (
             <Moon className="w-5 h-5" />
           )}
-          <span>{theme === 'dark' ? '라이트 모드' : '다크 모드'}</span>
+          <span>{mounted && theme === 'dark' ? '라이트 모드' : '다크 모드'}</span>
         </button>
       </div>
 
