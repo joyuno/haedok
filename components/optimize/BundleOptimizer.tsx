@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatKRW } from '@/lib/utils/formatCurrency';
 import type { BundleOptimization } from '@/lib/calculations/bundleOptimize';
 import { BUNDLE_DEALS, type BundleDeal } from '@/lib/constants/bundleDeals';
+import { Button } from '@/components/ui/button';
 import { Package, TrendingDown, ArrowRight, ExternalLink, Sparkles } from 'lucide-react';
 import { BrandIcon } from '@/components/subscription/BrandIcon';
 
@@ -65,9 +66,9 @@ function BundleDealCard({ deal, isRecommended }: { deal: BundleDeal; isRecommend
                 href={deal.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-2"
+                className="inline-flex items-center justify-center gap-1.5 mt-3 w-full rounded-xl bg-primary/[0.08] hover:bg-primary/[0.15] text-primary text-sm font-bold py-2.5 transition-colors"
               >
-                자세히 보기 <ExternalLink className="w-3 h-3" />
+                가입 페이지 이동 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             )}
           </div>
@@ -169,6 +170,19 @@ export function BundleOptimizer({ optimizations }: BundleOptimizerProps) {
                     </p>
                   </div>
                 </div>
+
+                {opt.bundle.url && (
+                  <a
+                    href={opt.bundle.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button className="w-full rounded-xl font-bold mt-2" size="lg">
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      번들 가입하러 가기
+                    </Button>
+                  </a>
+                )}
               </CardContent>
             </Card>
           ))}

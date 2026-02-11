@@ -105,25 +105,29 @@ function EventCard({ event, isMatched }: { event: DiscountEvent; isMatched?: boo
               </p>
             )}
 
-            {/* Valid until & link row */}
-            <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-border/50">
-              {event.validUntil && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="w-3 h-3" />
-                  <span>{event.validUntil}</span>
-                </div>
-              )}
-              {event.url && (
-                <a
-                  href={event.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-medium"
-                >
-                  자세히 보기 <ExternalLink className="w-3 h-3" />
-                </a>
-              )}
-            </div>
+            {/* Valid until */}
+            {event.validUntil && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground mt-3">
+                <Clock className="w-3 h-3" />
+                <span>{event.validUntil}</span>
+              </div>
+            )}
+
+            {/* CTA button */}
+            {event.url && (
+              <a
+                href={event.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center justify-center gap-1.5 mt-3 w-full rounded-xl text-sm font-bold py-2.5 transition-colors ${
+                  isMatched
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-primary/[0.08] hover:bg-primary/[0.15] text-primary'
+                }`}
+              >
+                {isMatched ? '할인 적용하러 가기' : '혜택 확인하기'} <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
           </div>
         </div>
       </CardContent>

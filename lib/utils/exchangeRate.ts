@@ -1,5 +1,5 @@
-// USD/KRW 실시간 환율 (무료 API, 클라이언트사이드)
-// 24시간 캐시, localStorage 저장
+// USD/KRW 당일 환율 조회 (무료 API, 클라이언트사이드)
+// 하루 1회 조회, 24시간 localStorage 캐시
 
 const CACHE_KEY = 'subscout_exchange_rate';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24h
