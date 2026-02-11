@@ -51,26 +51,32 @@ export default function GuidePage() {
   ];
 
   return (
-    <div className="container max-w-4xl mx-auto p-6 space-y-6">
+    <div className="container max-w-4xl mx-auto p-6 space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-          <BookOpen className="h-8 w-8" />
+        <h1 className="text-4xl font-bold mb-3 flex items-center gap-3">
+          <BookOpen className="h-9 w-9" />
           사용 가이드
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-lg">
           앱 사용 시간을 확인하고 SubScout을 최대한 활용하는 방법
         </p>
       </div>
 
       {/* Platform Guides */}
       <Tabs defaultValue="ios" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="ios" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-2 rounded-xl p-1.5 bg-accent">
+          <TabsTrigger
+            value="ios"
+            className="flex items-center gap-2 rounded-lg font-semibold"
+          >
             <Smartphone className="h-4 w-4" />
             iOS (iPhone/iPad)
           </TabsTrigger>
-          <TabsTrigger value="android" className="flex items-center gap-2">
+          <TabsTrigger
+            value="android"
+            className="flex items-center gap-2 rounded-lg font-semibold"
+          >
             <Smartphone className="h-4 w-4" />
             Android
           </TabsTrigger>
@@ -86,23 +92,26 @@ export default function GuidePage() {
       </Tabs>
 
       {/* FAQ Section */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex items-center gap-3">
-          <HelpCircle className="h-6 w-6" />
-          <h2 className="text-2xl font-bold">자주 묻는 질문</h2>
+          <HelpCircle className="h-7 w-7" />
+          <h2 className="text-3xl font-bold">자주 묻는 질문</h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {faqs.map((faq, index) => (
-            <Card key={index}>
-              <CardContent className="p-5">
-                <div className="flex items-start gap-3">
-                  <Badge variant="outline" className="mt-0.5">
+            <Card key={index} className="rounded-2xl">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <Badge
+                    variant="outline"
+                    className="mt-0.5 rounded-lg font-semibold"
+                  >
                     Q{index + 1}
                   </Badge>
-                  <div className="flex-1 space-y-2">
-                    <h3 className="font-semibold">{faq.question}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                  <div className="flex-1 space-y-3">
+                    <h3 className="font-bold text-lg">{faq.question}</h3>
+                    <p className="text-base text-muted-foreground leading-relaxed">
                       {faq.answer}
                     </p>
                   </div>
@@ -114,16 +123,16 @@ export default function GuidePage() {
       </div>
 
       {/* Additional Help */}
-      <Card className="border-dashed">
-        <CardContent className="p-6 text-center">
-          <h3 className="font-semibold mb-2">더 궁금한 점이 있으신가요?</h3>
-          <p className="text-sm text-muted-foreground mb-4">
+      <Card className="border-dashed rounded-2xl">
+        <CardContent className="p-8 text-center">
+          <h3 className="font-bold text-xl mb-3">더 궁금한 점이 있으신가요?</h3>
+          <p className="text-base text-muted-foreground mb-6">
             SubScout 팀에 문의하시면 빠르게 도와드릴게요
           </p>
           <div className="flex justify-center gap-3">
             <a
               href="mailto:support@subscout.com"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4"
+              className="inline-flex items-center justify-center rounded-xl text-base font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground px-8 py-4"
             >
               이메일 문의
             </a>

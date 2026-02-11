@@ -59,17 +59,17 @@ export function SubscriptionList({
     <div className="space-y-6">
       <div className="flex flex-wrap gap-4">
         <div className="flex-1 min-w-[200px]">
-          <Label htmlFor="sort" className="mb-2 block">
+          <Label htmlFor="sort" className="mb-2 block font-semibold">
             정렬
           </Label>
           <Select
             value={sortBy}
             onValueChange={(v) => setSortBy(v as SortOption)}
           >
-            <SelectTrigger id="sort">
+            <SelectTrigger id="sort" className="rounded-xl">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-xl">
               <SelectItem value="name">이름순</SelectItem>
               <SelectItem value="price">가격순</SelectItem>
               <SelectItem value="category">카테고리순</SelectItem>
@@ -79,7 +79,7 @@ export function SubscriptionList({
         </div>
 
         <div className="flex-1 min-w-[200px]">
-          <Label htmlFor="filter" className="mb-2 block">
+          <Label htmlFor="filter" className="mb-2 block font-semibold">
             카테고리 필터
           </Label>
           <Select
@@ -88,10 +88,10 @@ export function SubscriptionList({
               setFilterCategory(v as SubscriptionCategory | 'all')
             }
           >
-            <SelectTrigger id="filter">
+            <SelectTrigger id="filter" className="rounded-xl">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-xl">
               <SelectItem value="all">전체</SelectItem>
               {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
                 <SelectItem key={key} value={key}>
@@ -103,7 +103,7 @@ export function SubscriptionList({
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {sortedSubscriptions.map((subscription) => (
           <SubscriptionCard
             key={subscription.id}
@@ -114,23 +114,30 @@ export function SubscriptionList({
       </div>
 
       {sortedSubscriptions.length === 0 && (
-        <div className="py-12 text-center text-muted-foreground">
+        <div className="py-16 text-center text-muted-foreground text-lg font-medium">
           표시할 구독이 없습니다.
         </div>
       )}
 
       {sortedSubscriptions.length > 0 && (
-        <Card className="border-t-4 border-t-primary">
-          <CardContent className="p-6">
+        <Card className="rounded-2xl border-border bg-accent">
+          <CardContent className="p-7">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">월 총 결제 금액</p>
-                <p className="text-3xl font-bold mt-1">{formatKRW(totalMonthly)}</p>
+                <p className="text-sm text-muted-foreground font-medium mb-2">
+                  월 총 결제 금액
+                </p>
+                <p className="text-4xl font-bold text-foreground">
+                  {formatKRW(totalMonthly)}
+                </p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">활성 구독</p>
-                <p className="text-2xl font-semibold mt-1">
-                  {subscriptions.filter((s) => s.status === 'active' || s.status === 'trial').length}개
+                <p className="text-sm text-muted-foreground font-medium mb-2">
+                  활성 구독
+                </p>
+                <p className="text-3xl font-bold text-foreground">
+                  {subscriptions.filter((s) => s.status === 'active' || s.status === 'trial').length}
+                  개
                 </p>
               </div>
             </div>

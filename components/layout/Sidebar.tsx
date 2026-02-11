@@ -33,16 +33,16 @@ export function Sidebar() {
   );
 
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-slate-900 text-white">
+    <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-border">
       {/* Logo */}
-      <div className="flex items-center gap-2 h-16 px-6 border-b border-slate-800">
-        <Search className="w-6 h-6 text-blue-400" />
-        <span className="text-xl font-bold">SubScout</span>
+      <div className="flex items-center gap-2 h-16 px-6 border-b border-border">
+        <Search className="w-6 h-6 text-primary" />
+        <span className="text-xl font-bold text-foreground">SubScout</span>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 py-6 px-3 overflow-y-auto">
-        <ul className="space-y-1">
+        <ul className="space-y-1.5">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -52,14 +52,14 @@ export function Sidebar() {
                 <Link
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors',
+                    'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200',
                     isActive
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white',
+                      ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
+                      : 'text-muted-foreground hover:bg-accent hover:text-foreground font-medium',
                   )}
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <span>{item.label}</span>
                 </Link>
               </li>
             );
@@ -68,10 +68,12 @@ export function Sidebar() {
       </nav>
 
       {/* Total Cost Display */}
-      <div className="p-6 border-t border-slate-800">
-        <div className="bg-slate-800 rounded-lg p-4">
-          <p className="text-xs text-slate-400 mb-1">월 총 구독료</p>
-          <p className="text-2xl font-bold text-blue-400">
+      <div className="p-4 border-t border-border">
+        <div className="bg-accent rounded-2xl p-5">
+          <p className="text-xs text-muted-foreground font-medium mb-2">
+            월 총 구독료
+          </p>
+          <p className="text-3xl font-bold text-foreground">
             {formatKRW(totalMonthlyCost)}
           </p>
         </div>

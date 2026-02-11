@@ -86,19 +86,23 @@ export default function PartyPage() {
     : null;
 
   return (
-    <div className="container max-w-6xl mx-auto p-6 space-y-6">
+    <div className="container max-w-6xl mx-auto p-6 space-y-8">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-            <Users className="h-8 w-8" />
+          <h1 className="text-4xl font-bold mb-3 flex items-center gap-3">
+            <Users className="h-9 w-9" />
             공유 파티
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-lg">
             구독을 함께 나누고 비용을 절약하세요
           </p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)} size="lg">
+        <Button
+          onClick={() => setShowCreateDialog(true)}
+          size="lg"
+          className="rounded-xl font-semibold"
+        >
           <Plus className="mr-2 h-4 w-4" />
           파티 만들기
         </Button>
@@ -106,31 +110,39 @@ export default function PartyPage() {
 
       {/* Main Content */}
       <Tabs defaultValue="my-parties" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="my-parties">
+        <TabsList className="grid w-full grid-cols-2 rounded-xl p-1.5 bg-accent">
+          <TabsTrigger value="my-parties" className="rounded-lg font-semibold">
             내 파티 ({activeParties.length})
           </TabsTrigger>
-          <TabsTrigger value="join">파티 참가하기</TabsTrigger>
+          <TabsTrigger value="join" className="rounded-lg font-semibold">
+            파티 참가하기
+          </TabsTrigger>
         </TabsList>
 
         {/* My Parties Tab */}
         <TabsContent value="my-parties" className="space-y-6">
           {activeParties.length === 0 ? (
-            <Card>
-              <CardContent className="py-16 text-center">
-                <PartyPopper className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">
+            <Card className="rounded-2xl">
+              <CardContent className="py-20 text-center">
+                <PartyPopper className="h-20 w-20 mx-auto text-muted-foreground/30 mb-6" />
+                <h3 className="text-2xl font-bold mb-3">
                   아직 참여한 파티가 없어요
                 </h3>
-                <p className="text-muted-foreground mb-6">
+                <p className="text-muted-foreground mb-8 text-lg">
                   새로운 파티를 만들거나 친구의 파티에 참가해보세요
                 </p>
                 <div className="flex justify-center gap-3">
-                  <Button onClick={() => setShowCreateDialog(true)}>
+                  <Button
+                    onClick={() => setShowCreateDialog(true)}
+                    className="rounded-xl font-semibold px-8 py-6 text-base"
+                  >
                     <Plus className="mr-2 h-4 w-4" />
                     파티 만들기
                   </Button>
-                  <Button variant="outline">
+                  <Button
+                    variant="outline"
+                    className="rounded-xl font-semibold px-8 py-6 text-base"
+                  >
                     <LogIn className="mr-2 h-4 w-4" />
                     파티 참가하기
                   </Button>
@@ -164,45 +176,50 @@ export default function PartyPage() {
 
         {/* Join Party Tab */}
         <TabsContent value="join" className="space-y-6">
-          <Card>
-            <CardContent className="p-6 space-y-6">
+          <Card className="rounded-2xl">
+            <CardContent className="p-8 space-y-6">
               <div>
-                <h3 className="text-lg font-semibold mb-2">
+                <h3 className="text-xl font-bold mb-2">
                   초대 코드로 참가하기
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   친구에게 받은 초대 코드를 입력하세요
                 </p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="invite-code">초대 코드</Label>
+                  <Label htmlFor="invite-code" className="font-semibold">
+                    초대 코드
+                  </Label>
                   <Input
                     id="invite-code"
                     placeholder="예: ABC123"
                     value={joinCode}
                     onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                     maxLength={6}
-                    className="font-mono text-lg tracking-wider"
+                    className="font-mono text-lg tracking-wider rounded-xl"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="join-nickname">내 닉네임</Label>
+                  <Label htmlFor="join-nickname" className="font-semibold">
+                    내 닉네임
+                  </Label>
                   <Input
                     id="join-nickname"
                     placeholder="파티에서 사용할 닉네임"
                     value={joinNickname}
                     onChange={(e) => setJoinNickname(e.target.value)}
                     maxLength={20}
+                    className="rounded-xl"
                   />
                 </div>
 
                 <Button
                   onClick={handleJoinParty}
                   disabled={!joinCode.trim() || !joinNickname.trim()}
-                  className="w-full"
+                  className="w-full rounded-xl font-semibold"
                   size="lg"
                 >
                   <LogIn className="mr-2 h-4 w-4" />
@@ -216,9 +233,11 @@ export default function PartyPage() {
 
       {/* Create Party Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
-            <DialogTitle>새 공유 파티 만들기</DialogTitle>
+            <DialogTitle className="text-2xl font-bold">
+              새 공유 파티 만들기
+            </DialogTitle>
           </DialogHeader>
           <PartyCreateForm onSuccess={handleCreateSuccess} />
         </DialogContent>
@@ -226,9 +245,11 @@ export default function PartyPage() {
 
       {/* Share Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg rounded-2xl">
           <DialogHeader>
-            <DialogTitle>파티 초대하기</DialogTitle>
+            <DialogTitle className="text-xl font-bold">
+              파티 초대하기
+            </DialogTitle>
           </DialogHeader>
           {currentParty && <InviteLinkShare party={currentParty} />}
         </DialogContent>
@@ -236,9 +257,9 @@ export default function PartyPage() {
 
       {/* Members Dialog */}
       <Dialog open={showMembersDialog} onOpenChange={setShowMembersDialog}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg rounded-2xl">
           <DialogHeader>
-            <DialogTitle>파티원 목록</DialogTitle>
+            <DialogTitle className="text-xl font-bold">파티원 목록</DialogTitle>
           </DialogHeader>
           {currentParty && (
             <PartyMemberList

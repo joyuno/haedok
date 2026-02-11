@@ -44,28 +44,36 @@ export default function SubscriptionsPage() {
     <div className="container mx-auto px-4 py-8 max-w-5xl">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">구독 관리</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold mb-2">구독 관리</h1>
+          <p className="text-muted-foreground text-lg">
             모든 구독을 한 곳에서 관리하세요
           </p>
         </div>
-        <Button size="lg" onClick={() => setDialogOpen(true)}>
+        <Button
+          size="lg"
+          onClick={() => setDialogOpen(true)}
+          className="rounded-xl font-semibold shadow-sm"
+        >
           <Plus className="mr-2 h-5 w-5" />
           구독 추가
         </Button>
       </div>
 
       {subscriptionCount === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <PackageOpen className="h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold mb-2">
+        <Card className="border-dashed rounded-2xl">
+          <CardContent className="flex flex-col items-center justify-center py-20">
+            <PackageOpen className="h-20 w-20 text-muted-foreground/30 mb-6" />
+            <h3 className="text-2xl font-bold mb-3">
               아직 등록된 구독이 없습니다
             </h3>
-            <p className="text-muted-foreground mb-6 text-center">
+            <p className="text-muted-foreground mb-8 text-center text-lg">
               구독 서비스를 추가하고 체계적으로 관리해보세요
             </p>
-            <Button size="lg" onClick={() => setDialogOpen(true)}>
+            <Button
+              size="lg"
+              onClick={() => setDialogOpen(true)}
+              className="rounded-xl font-semibold px-8 py-6 text-base"
+            >
               <Plus className="mr-2 h-5 w-5" />
               첫 구독 추가하기
             </Button>
@@ -73,21 +81,21 @@ export default function SubscriptionsPage() {
         </Card>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-sm text-muted-foreground mb-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+            <Card className="rounded-2xl border-border">
+              <CardContent className="p-7">
+                <p className="text-sm text-muted-foreground font-medium mb-2">
                   총 구독 수
                 </p>
-                <p className="text-4xl font-bold">{subscriptionCount}개</p>
+                <p className="text-5xl font-bold">{subscriptionCount}개</p>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-sm text-muted-foreground mb-1">
+            <Card className="rounded-2xl border-border">
+              <CardContent className="p-7">
+                <p className="text-sm text-muted-foreground font-medium mb-2">
                   월 총 결제 금액
                 </p>
-                <p className="text-4xl font-bold">
+                <p className="text-5xl font-bold">
                   {formatKRW(totalMonthlyCost)}
                 </p>
               </CardContent>
@@ -102,9 +110,9 @@ export default function SubscriptionsPage() {
       )}
 
       <Dialog open={dialogOpen} onOpenChange={handleDialogClose}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-2xl font-bold">
               {editingSubscription ? '구독 수정' : '구독 추가'}
             </DialogTitle>
           </DialogHeader>

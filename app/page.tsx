@@ -63,17 +63,17 @@ export default function DashboardPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-6">
         <div className="text-center max-w-md">
-          <Package className="w-20 h-20 text-slate-300 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
+          <Package className="w-20 h-20 text-muted-foreground/30 mx-auto mb-6" />
+          <h2 className="text-3xl font-bold text-foreground mb-3">
             구독을 추가해보세요
           </h2>
-          <p className="text-slate-600 mb-6">
+          <p className="text-muted-foreground text-lg mb-8">
             구독 서비스를 추가하고 한눈에 관리하세요. 지출을 추적하고
             최적화할 수 있습니다.
           </p>
           <Link
             href="/subscriptions"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-semibold hover:shadow-lg transition-all duration-200 hover:scale-105"
           >
             <PlusCircle className="w-5 h-5" />
             구독 추가하기
@@ -84,18 +84,20 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-4 lg:p-8 space-y-6">
+    <div className="p-4 lg:p-8 space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">
+          <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
             대시보드
           </h1>
-          <p className="text-slate-600 mt-1">구독 현황을 한눈에 확인하세요</p>
+          <p className="text-muted-foreground text-lg mt-2">
+            구독 현황을 한눈에 확인하세요
+          </p>
         </div>
         <Link
           href="/subscriptions"
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm lg:text-base"
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-xl font-semibold hover:shadow-md transition-all duration-200 text-sm lg:text-base"
         >
           <PlusCircle className="w-4 h-4" />
           <span className="hidden sm:inline">구독 추가</span>
@@ -103,7 +105,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
         <CostSummaryCard
           title="월 총 구독료"
           amount={totalMonthlyCost}
@@ -127,16 +129,16 @@ export default function DashboardPage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Category Distribution */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">
+        <div className="bg-card rounded-2xl border border-border p-6 lg:p-7">
+          <h2 className="text-xl font-bold text-foreground mb-5">
             카테고리별 지출 비율
           </h2>
           <CategoryPieChart data={categoryData} />
         </div>
 
         {/* Upcoming Payments */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">
+        <div className="bg-card rounded-2xl border border-border p-6 lg:p-7">
+          <h2 className="text-xl font-bold text-foreground mb-5">
             이번 달 결제 일정
           </h2>
           <PaymentCalendar subscriptions={subscriptions} />
@@ -157,33 +159,39 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link
           href="/subscriptions"
-          className="bg-white rounded-lg border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition-all"
+          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200"
         >
-          <h3 className="font-semibold text-slate-900 mb-1">구독 관리</h3>
-          <p className="text-sm text-slate-600">
+          <h3 className="font-bold text-foreground mb-1.5">구독 관리</h3>
+          <p className="text-sm text-muted-foreground font-medium">
             구독을 추가하고 관리하세요
           </p>
         </Link>
         <Link
           href="/analysis"
-          className="bg-white rounded-lg border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition-all"
+          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200"
         >
-          <h3 className="font-semibold text-slate-900 mb-1">이용률 분석</h3>
-          <p className="text-sm text-slate-600">사용 패턴을 분석하세요</p>
+          <h3 className="font-bold text-foreground mb-1.5">이용률 분석</h3>
+          <p className="text-sm text-muted-foreground font-medium">
+            사용 패턴을 분석하세요
+          </p>
         </Link>
         <Link
           href="/optimize"
-          className="bg-white rounded-lg border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition-all"
+          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200"
         >
-          <h3 className="font-semibold text-slate-900 mb-1">공유 최적화</h3>
-          <p className="text-sm text-slate-600">비용을 절감하세요</p>
+          <h3 className="font-bold text-foreground mb-1.5">공유 최적화</h3>
+          <p className="text-sm text-muted-foreground font-medium">
+            비용을 절감하세요
+          </p>
         </Link>
         <Link
           href="/guide"
-          className="bg-white rounded-lg border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition-all"
+          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200"
         >
-          <h3 className="font-semibold text-slate-900 mb-1">입력 가이드</h3>
-          <p className="text-sm text-slate-600">CSV로 빠르게 추가하세요</p>
+          <h3 className="font-bold text-foreground mb-1.5">입력 가이드</h3>
+          <p className="text-sm text-muted-foreground font-medium">
+            CSV로 빠르게 추가하세요
+          </p>
         </Link>
       </div>
     </div>

@@ -29,7 +29,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background`}
       >
         <div className="min-h-screen">
           {/* Desktop Sidebar */}

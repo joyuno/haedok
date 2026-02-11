@@ -21,8 +21,8 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
 
   if (chartData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-80 text-slate-400">
-        <p>카테고리별 데이터가 없습니다</p>
+      <div className="flex items-center justify-center h-80 text-muted-foreground">
+        <p className="font-medium">카테고리별 데이터가 없습니다</p>
       </div>
     );
   }
@@ -42,11 +42,13 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
             outerRadius={100}
             fill="#8884d8"
             dataKey="value"
+            strokeWidth={2}
           >
             {chartData.map((entry) => (
               <Cell
                 key={entry.category}
                 fill={CATEGORY_COLORS[entry.category]}
+                stroke="white"
               />
             ))}
           </Pie>
@@ -54,14 +56,19 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
             formatter={(value) => (value ? formatKRW(value as number) : '₩0')}
             contentStyle={{
               backgroundColor: 'white',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
+              border: '1px solid hsl(var(--border))',
+              borderRadius: '12px',
+              padding: '12px',
+              fontSize: '14px',
+              fontWeight: 500,
             }}
           />
           <Legend
             verticalAlign="bottom"
             height={36}
-            formatter={(value) => <span className="text-sm">{value}</span>}
+            formatter={(value) => (
+              <span className="text-sm font-medium">{value}</span>
+            )}
           />
         </PieChart>
       </ResponsiveContainer>
