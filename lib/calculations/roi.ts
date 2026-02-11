@@ -121,7 +121,7 @@ export function calculateROIAnalysis(
     monthlyPrice: subscription.monthlyPrice,
     weeklyUsageMinutes,
     monthlyUsageMinutes,
-    costPerMinute: isFinite(costPerMinute) ? Math.round(costPerMinute) : 0,
+    costPerMinute: isFinite(costPerMinute) ? parseFloat(costPerMinute.toFixed(2)) : 0,
     grade,
     recommendation: action,
     recommendationReason: reason,

@@ -14,7 +14,7 @@ import {
 import { useUsageStore } from '@/stores/usageStore';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { parseCSV, type ParsedUsageEntry } from '@/lib/utils/csvParser';
-import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, Download } from 'lucide-react';
 import { BrandIcon } from '@/components/subscription/BrandIcon';
 
 interface CsvUploaderProps {
@@ -112,6 +112,24 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
     new Set(parsedEntries.map((e) => e.appName)),
   );
 
+  const handleDownloadTemplate = () => {
+    const activeNames = subscriptions
+      .filter((s) => s.status === 'active' || s.status === 'trial')
+      .map((s) => s.name);
+    const header = 'App Name,Weekly Hours';
+    const rows = activeNames.length > 0
+      ? activeNames.map((name) => `${name},0`)
+      : ['넷플릭스,3', '유튜브 프리미엄,7', '스포티파이,5'];
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'subscout_usage_template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -142,6 +160,14 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
                 ActionDash / StayFree 형식 지원
               </p>
             </div>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleDownloadTemplate}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              CSV 양식 다운로드
+            </Button>
             <input
               ref={fileInputRef}
               type="file"
