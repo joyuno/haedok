@@ -23,6 +23,8 @@ export interface ServicePreset {
   cancellationUrl?: string;
   brandColor?: string;
   domain?: string;
+  /** Direct logo URL override — used when favicon APIs return low-quality icons */
+  logoUrl?: string;
 }
 
 export const SERVICE_PRESETS: Record<string, ServicePreset> = {
@@ -86,6 +88,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.wavve.com/my/membership',
     brandColor: '#1DB4A4',
     domain: 'www.wavve.com',
+    logoUrl: 'https://icon.horse/icon/www.wavve.com?size=large',
   },
   티빙: {
     name: '티빙',
@@ -242,6 +245,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.genie.co.kr/myInfo/payment',
     brandColor: '#3B82F6',
     domain: 'genie.co.kr',
+    logoUrl: 'https://icon.horse/icon/genie.co.kr?size=large',
   },
   '멜론': {
     name: '멜론',
@@ -256,6 +260,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.melon.com/mymusic/ticket/mymusicticket_inform.htm',
     brandColor: '#00CD3C',
     domain: 'melon.com',
+    logoUrl: 'https://icon.horse/icon/melon.com?size=large',
   },
   'FLO': {
     name: 'FLO',
@@ -270,6 +275,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.music-flo.com/my/pass',
     brandColor: '#4CEDB0',
     domain: 'music-flo.com',
+    logoUrl: 'https://icon.horse/icon/music-flo.com?size=large',
   },
   'YouTube Music': {
     name: 'YouTube Music',
@@ -555,6 +561,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.millie.co.kr/v3/mypage/subscription',
     brandColor: '#FFCE00',
     domain: 'millie.co.kr',
+    logoUrl: 'https://icon.horse/icon/millie.co.kr?size=large',
   },
   리디셀렉트: {
     name: '리디셀렉트',

@@ -10,24 +10,25 @@ interface BrandIconProps {
 }
 
 /**
- * Favicon URL sources in priority order.
- * Falls back through each source on image load error.
+ * Build favicon URL list. If the preset has a logoUrl override, use it first.
+ * Otherwise cycle through icon.horse (best for KR services) → Google FaviconV2 → Google S2.
  */
-function getFaviconUrls(domain: string): string[] {
-  return [
-    // Google's high-res favicon V2 API (best quality)
-    `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${domain}&size=128`,
-    // icon.horse - good fallback
+function getFaviconUrls(domain: string, logoUrl?: string): string[] {
+  const urls: string[] = [];
+  if (logoUrl) urls.push(logoUrl);
+  urls.push(
     `https://icon.horse/icon/${domain}?size=large`,
-    // Google S2 classic API
+    `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${domain}&size=128`,
     `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
-  ];
+  );
+  return urls;
 }
 
 export function BrandIcon({ name, icon, size = 'md' }: BrandIconProps) {
   const preset = getServicePreset(name);
   const brandColor = preset?.brandColor;
   const domain = preset?.domain;
+  const logoUrl = preset?.logoUrl;
   const [faviconIndex, setFaviconIndex] = useState(0);
   const [allFailed, setAllFailed] = useState(false);
 
@@ -37,7 +38,7 @@ export function BrandIcon({ name, icon, size = 'md' }: BrandIconProps) {
     lg: 'w-16 h-16 text-3xl',
   };
 
-  const faviconUrls = domain ? getFaviconUrls(domain) : [];
+  const faviconUrls = domain ? getFaviconUrls(domain, logoUrl) : [];
 
   const handleImgError = () => {
     if (faviconIndex < faviconUrls.length - 1) {
