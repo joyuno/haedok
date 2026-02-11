@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Smartphone, Clock, ChevronRight } from 'lucide-react';
+import { Smartphone, Clock, ChevronDown } from 'lucide-react';
 
 export function IOSGuide() {
   const steps = [
@@ -108,7 +108,9 @@ export function IOSGuide() {
                   </div>
                   <p className="text-muted-foreground">{step.description}</p>
                 </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground mt-3" />
+                {step.number < steps.length && (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground mt-3" />
+                )}
               </div>
             </CardContent>
           </Card>
