@@ -11,7 +11,10 @@ import {
   BookOpen,
   Sparkles,
   Search,
+  Moon,
+  Sun,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useSubscriptionStore } from '@/stores';
 import { formatKRW } from '@/lib/utils/formatCurrency';
 import { cn } from '@/lib/utils';
@@ -28,12 +31,17 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
   const totalMonthlyCost = useSubscriptionStore((state) =>
     state.getTotalMonthlyCost(),
   );
 
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-border">
+    <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-sidebar border-r border-border">
       {/* Logo */}
       <div className="flex items-center gap-2 h-16 px-6 border-b border-border">
         <Search className="w-6 h-6 text-primary" />
@@ -66,6 +74,21 @@ export function Sidebar() {
           })}
         </ul>
       </nav>
+
+      {/* Dark Mode Toggle */}
+      <div className="px-4 pb-2">
+        <button
+          onClick={toggleTheme}
+          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-muted-foreground hover:bg-accent hover:text-foreground font-medium transition-all duration-200"
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-5 h-5" />
+          ) : (
+            <Moon className="w-5 h-5" />
+          )}
+          <span>{theme === 'dark' ? '라이트 모드' : '다크 모드'}</span>
+        </button>
+      </div>
 
       {/* Total Cost Display */}
       <div className="p-4 border-t border-border">
