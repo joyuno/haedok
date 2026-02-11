@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { formatKRW } from '@/lib/utils/formatCurrency';
 import { BrandIcon } from '@/components/subscription/BrandIcon';
+import { TossEmoji } from '@/components/ui/TossEmoji';
 
 interface Badge {
   id: string;
@@ -63,7 +64,9 @@ export function ChallengeTracker() {
       {/* Current Status -- Toss-style hero card */}
       <div className="rounded-2xl bg-card border border-border p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
         <div className="text-center mb-6">
-          <div className="text-5xl mb-2">{currentBadge?.emoji || '🎯'}</div>
+          <div className="mb-2 flex justify-center">
+            <TossEmoji emoji={currentBadge?.emoji || '🎯'} size={56} />
+          </div>
           <h4 className="text-lg font-extrabold text-foreground mb-1">
             {currentBadge ? `${currentBadge.name} 달성!` : '시작하세요!'}
           </h4>
@@ -118,7 +121,9 @@ export function ChallengeTracker() {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`text-3xl ${earned ? '' : 'grayscale'}`}>{badge.emoji}</div>
+                  <div className={earned ? '' : 'grayscale opacity-50'}>
+                    <TossEmoji emoji={badge.emoji} size={36} />
+                  </div>
                   <div className="flex-1">
                     <div className="font-bold text-sm text-foreground">{badge.name}</div>
                     <div className="text-xs text-muted-foreground font-medium">
@@ -164,7 +169,7 @@ export function ChallengeTracker() {
       {cancelledSubscriptions.length === 0 && (
         <div className="rounded-2xl border-2 border-dashed border-border p-8 text-center">
           <div className="w-12 h-12 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
-            <span className="text-2xl">✂️</span>
+            <TossEmoji emoji="✂️" size={28} />
           </div>
           <p className="text-sm text-muted-foreground font-medium">
             아직 절약한 구독이 없어요.<br />

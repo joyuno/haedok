@@ -9,6 +9,7 @@ import {
   ChallengeTracker,
 } from '@/components/innovation';
 import { Sparkles } from 'lucide-react';
+import { TossEmoji } from '@/components/ui/TossEmoji';
 
 export default function InsightsPage() {
   const getActiveSubscriptions = useSubscriptionStore((s) => s.getActiveSubscriptions);
@@ -32,7 +33,7 @@ export default function InsightsPage() {
         <div className="flex items-center justify-center min-h-[500px]">
           <div className="text-center max-w-md">
             <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mx-auto mb-5">
-              <span className="text-4xl">🔍</span>
+              <TossEmoji emoji="🔍" size={48} />
             </div>
             <h2 className="text-2xl font-extrabold text-foreground mb-3">아직 구독이 없어요</h2>
             <p className="text-sm text-muted-foreground mb-8 font-medium leading-relaxed">

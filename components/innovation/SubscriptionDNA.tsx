@@ -6,6 +6,7 @@ import { analyzeDNA } from '@/lib/calculations/subscriptionDNA';
 import { formatKRW } from '@/lib/utils/formatCurrency';
 import { CATEGORY_LABELS, CATEGORY_COLORS, type SubscriptionCategory } from '@/lib/types/subscription';
 import { Button } from '@/components/ui/button';
+import { TossEmoji } from '@/components/ui/TossEmoji';
 import { Share2 } from 'lucide-react';
 
 export function SubscriptionDNA() {
@@ -67,7 +68,9 @@ export function SubscriptionDNA() {
 
       {/* DNA Type Result */}
       <div className="text-center mb-8 relative">
-        <div className="text-6xl mb-3">{dnaProfile.emoji}</div>
+        <div className="mb-3 flex justify-center">
+          <TossEmoji emoji={dnaProfile.emoji} size={72} />
+        </div>
         <h2 className="text-2xl font-extrabold text-foreground mb-1.5">{dnaProfile.name}</h2>
         <p className="text-sm text-muted-foreground font-medium mb-4 max-w-sm mx-auto">{dnaProfile.description}</p>
         <div className="inline-flex items-center gap-2 bg-primary/[0.06] rounded-full px-5 py-2 text-sm font-bold text-primary">
