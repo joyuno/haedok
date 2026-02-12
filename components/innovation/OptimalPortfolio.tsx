@@ -1,10 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { formatKRW } from '@/lib/utils/formatCurrency';
 import { CATEGORY_LABELS, CATEGORY_COLORS, type SubscriptionCategory } from '@/lib/types/subscription';
 import { generateSavingsReport } from '@/lib/calculations/savingsAnalysis';
+import { callLLM } from '@/lib/utils/llmApi';
+import { Sparkles } from 'lucide-react';
 import {
   RadarChart,
   Radar,
@@ -15,6 +17,39 @@ import {
   Legend,
   Tooltip,
 } from 'recharts';
+
+// ── AI Portfolio Advice types ────────────────────────────────────────
+interface AIRecommendation {
+  name: string;
+  action: 'keep' | 'cancel' | 'downgrade' | 'share' | 'switch';
+  reason: string;
+  monthlySaving: number;
+}
+
+interface AIPortfolioAdvice {
+  summary: string;
+  recommendations: AIRecommendation[];
+  optimizedMonthly: number;
+  keepValue: string;
+}
+
+const ACTION_STYLES: Record<AIRecommendation['action'], { label: string; color: string; bg: string }> = {
+  keep: { label: '유지', color: '#1FC08E', bg: 'rgba(31,192,142,0.08)' },
+  cancel: { label: '해지', color: '#F04452', bg: 'rgba(240,68,82,0.08)' },
+  downgrade: { label: '다운그레이드', color: '#FFA826', bg: 'rgba(255,168,38,0.08)' },
+  share: { label: '공유', color: '#3182F6', bg: 'rgba(49,130,246,0.08)' },
+  switch: { label: '전환', color: '#8B5CF6', bg: 'rgba(139,92,246,0.08)' },
+};
+
+function parseAIResponse(content: string): AIPortfolioAdvice | null {
+  try {
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+    return JSON.parse(jsonMatch[0]);
+  } catch {
+    return null;
+  }
+}
 
 // ── Recommended allocation (Korean average) ────────────────────────────
 const RECOMMENDED_RATIO: Record<SubscriptionCategory, number> = {
@@ -163,6 +198,87 @@ export function OptimalPortfolio() {
     };
   }, [activeSubscriptions, totalCost]);
 
+  // ── AI Analysis state ──────────────────────────────────────────────
+  const [aiAdvice, setAiAdvice] = useState<string | null>(null);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  const parsedAIAdvice = useMemo<AIPortfolioAdvice | null>(() => {
+    if (!aiAdvice) return null;
+    return parseAIResponse(aiAdvice);
+  }, [aiAdvice]);
+
+  const handleAIAnalysis = useCallback(async () => {
+    setIsLoadingAI(true);
+    setAiError(null);
+    setAiAdvice(null);
+
+    const subscriptionData = activeSubscriptions.map((sub) => ({
+      name: sub.name,
+      category: CATEGORY_LABELS[sub.category],
+      monthlyPrice: sub.monthlyPrice,
+      isShared: sub.isShared,
+      sharedCount: sub.sharedCount,
+    }));
+
+    const categoryRatios = analysis.diffs
+      .filter((d) => d.currentPct > 0)
+      .map((d) => ({
+        category: d.label,
+        currentPct: d.currentPct,
+        recommendedPct: d.recommendedPct,
+        spend: d.currentSpend,
+      }));
+
+    const systemMessage = `당신은 구독 관리 전문가입니다. 사용자의 구독 목록을 분석하여 가치 대비 최적의 구독 조합을 추천합니다.
+
+핵심 원칙:
+- 단순히 "다 끊으세요"는 절대 추천하지 마세요
+- 사용자가 가치를 느끼는 구독은 유지를 추천하세요
+- 중복되는 서비스(예: 넷플릭스+웨이브+쿠팡플레이)가 있으면 하나로 정리를 추천하세요
+- 비용 대비 효용이 높은 구독은 "유지 추천"으로 명확히 말해주세요
+- 패밀리 공유나 번들로 전환 가능하면 추천하세요
+- 구체적인 금액과 이유를 포함하세요
+
+응답 형식 (JSON만 출력, 다른 텍스트 없이):
+{
+  "summary": "한 줄 요약 (예: OTT를 정리하고 생산성 도구를 유지하면 월 15,000원을 절약하면서도 핵심 서비스를 유지할 수 있어요)",
+  "recommendations": [
+    {
+      "name": "구독 이름",
+      "action": "keep" | "cancel" | "downgrade" | "share" | "switch",
+      "reason": "이유",
+      "monthlySaving": 0
+    }
+  ],
+  "optimizedMonthly": 총_최적화_후_월_비용_숫자,
+  "keepValue": "유지하는 구독들이 제공하는 핵심 가치 설명"
+}`;
+
+    const userMessage = `내 구독 목록:
+${JSON.stringify(subscriptionData, null, 2)}
+
+카테고리별 비율:
+${JSON.stringify(categoryRatios, null, 2)}
+
+총 월 비용: ${formatKRW(totalCost)}
+
+이 구독들을 분석해서 가치를 고려한 최적 조합을 추천해주세요.`;
+
+    const result = await callLLM([
+      { role: 'system', content: systemMessage },
+      { role: 'user', content: userMessage },
+    ]);
+
+    if (result.success) {
+      setAiAdvice(result.content);
+    } else {
+      setAiError(result.error || '분석에 실패했습니다.');
+    }
+
+    setIsLoadingAI(false);
+  }, [activeSubscriptions, analysis.diffs, totalCost]);
+
   if (activeSubscriptions.length === 0) {
     return null;
   }
@@ -300,6 +416,134 @@ export function OptimalPortfolio() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* AI 맞춤 분석 */}
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              AI 맞춤 포트폴리오 분석
+            </h4>
+            <p className="text-xs text-muted-foreground font-medium mt-0.5">
+              AI가 가치를 고려한 최적의 구독 조합을 추천해드려요
+            </p>
+          </div>
+          {!aiAdvice && !isLoadingAI && (
+            <button
+              onClick={handleAIAnalysis}
+              disabled={isLoadingAI}
+              className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 disabled:opacity-50 transition-all duration-200"
+            >
+              AI 분석 받기
+            </button>
+          )}
+        </div>
+
+        {isLoadingAI && (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+            <span className="ml-3 text-sm text-muted-foreground font-medium">AI가 구독을 분석하고 있어요...</span>
+          </div>
+        )}
+
+        {aiError && (
+          <div className="rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 p-4">
+            <p className="text-sm text-red-600 dark:text-red-400 font-medium">{aiError}</p>
+            <button onClick={handleAIAnalysis} className="mt-2 text-xs font-bold text-primary">
+              다시 시도
+            </button>
+          </div>
+        )}
+
+        {aiAdvice && !isLoadingAI && parsedAIAdvice && (
+          <div className="space-y-4">
+            {/* Summary */}
+            <div className="rounded-xl bg-primary/[0.04] border border-primary/10 p-4">
+              <p className="text-sm font-semibold text-foreground">{parsedAIAdvice.summary}</p>
+            </div>
+
+            {/* Recommendations */}
+            <div className="space-y-2">
+              {parsedAIAdvice.recommendations.map((rec, idx) => {
+                const style = ACTION_STYLES[rec.action] || ACTION_STYLES.keep;
+                return (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-3 p-3 rounded-xl border border-border"
+                    style={{ backgroundColor: style.bg }}
+                  >
+                    <span
+                      className="shrink-0 mt-0.5 px-2 py-0.5 rounded-md text-[10px] font-extrabold text-white"
+                      style={{ backgroundColor: style.color }}
+                    >
+                      {style.label}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold text-foreground">{rec.name}</span>
+                        {rec.monthlySaving > 0 && (
+                          <span className="text-xs font-bold tabular-nums" style={{ color: '#1FC08E' }}>
+                            -{formatKRW(rec.monthlySaving)}/월
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground font-medium mt-0.5">{rec.reason}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Cost Comparison */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl bg-accent/40 p-3 text-center">
+                <div className="text-[10px] text-muted-foreground font-semibold mb-0.5">현재 월 비용</div>
+                <div className="text-lg font-extrabold text-foreground tabular-nums">{formatKRW(totalCost)}</div>
+              </div>
+              <div className="rounded-xl bg-[#1FC08E]/[0.06] p-3 text-center">
+                <div className="text-[10px] text-[#1FC08E] font-semibold mb-0.5">AI 추천 월 비용</div>
+                <div className="text-lg font-extrabold tabular-nums" style={{ color: '#1FC08E' }}>
+                  {formatKRW(parsedAIAdvice.optimizedMonthly)}
+                </div>
+              </div>
+            </div>
+
+            {/* Keep Value */}
+            <div className="rounded-xl bg-accent/30 p-4">
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1">
+                유지하는 구독의 가치
+              </div>
+              <p className="text-sm font-medium text-foreground">{parsedAIAdvice.keepValue}</p>
+            </div>
+
+            {/* Reset button */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleAIAnalysis}
+                className="text-xs font-bold text-primary hover:text-primary/80 transition-colors"
+              >
+                다시 분석하기
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Fallback: raw text if JSON parse fails */}
+        {aiAdvice && !isLoadingAI && !parsedAIAdvice && (
+          <div className="rounded-xl bg-accent/30 p-4">
+            <p className="text-sm font-medium text-foreground whitespace-pre-wrap">{aiAdvice}</p>
+            <div className="flex justify-end mt-3">
+              <button
+                onClick={handleAIAnalysis}
+                className="text-xs font-bold text-primary hover:text-primary/80 transition-colors"
+              >
+                다시 분석하기
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Annual Cost Comparison: Current vs Optimized */}
