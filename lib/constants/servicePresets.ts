@@ -737,9 +737,16 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
 export const SERVICE_PRESETS_LIST: ServicePreset[] =
   Object.values(SERVICE_PRESETS);
 
-/** Get preset by name */
+/** Get preset by name (exact match → space-stripped match → preset.name match) */
 export function getServicePreset(name: string): ServicePreset | undefined {
-  return SERVICE_PRESETS[name];
+  if (SERVICE_PRESETS[name]) return SERVICE_PRESETS[name];
+
+  const stripped = name.replace(/\s/g, '');
+  if (SERVICE_PRESETS[stripped]) return SERVICE_PRESETS[stripped];
+
+  return SERVICE_PRESETS_LIST.find(
+    (p) => p.name.replace(/\s/g, '') === stripped,
+  );
 }
 
 /** Get presets filtered by category */
