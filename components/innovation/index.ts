@@ -7,3 +7,4 @@ export { ChallengeTracker } from './ChallengeTracker';
 export { SubscriptionTimeline } from './SubscriptionTimeline';
 export { OptimalPortfolio } from './OptimalPortfolio';
 export { PatternPredictor } from './PatternPredictor';
+export { StockInvestmentChart } from './StockInvestmentChart';

@@ -10,6 +10,7 @@ import {
   SubscriptionTimeline,
   OptimalPortfolio,
   PatternPredictor,
+  StockInvestmentChart,
 } from '@/components/innovation';
 import { Sparkles } from 'lucide-react';
 import { TossEmoji } from '@/components/ui/TossEmoji';
@@ -95,6 +96,13 @@ export default function InsightsPage() {
         {/* Section 3: Opportunity Cost Simulator */}
         <section>
           <OpportunityCostSimulator />
+        </section>
+
+        <div className="border-t border-border" />
+
+        {/* Section 3.5: Stock Investment Simulation */}
+        <section>
+          <StockInvestmentChart />
         </section>
 
         <div className="border-t border-border" />

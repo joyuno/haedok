@@ -76,12 +76,7 @@ export function ROIRankingList({ analyses }: ROIRankingListProps) {
                     </p>
                   </div>
                   <Badge
-                    style={{
-                      backgroundColor: gradeConfig.bgColor,
-                      color: gradeConfig.color,
-                      borderColor: gradeConfig.color,
-                    }}
-                    className="font-bold"
+                    className={`font-bold ${gradeConfig.badgeClass}`}
                   >
                     {gradeConfig.emoji} {analysis.grade}
                   </Badge>
@@ -109,11 +104,7 @@ export function ROIRankingList({ analyses }: ROIRankingListProps) {
 
                   {analysis.potentialSavings > 0 && (
                     <div
-                      className="flex items-center gap-2 text-sm mt-2 p-2 rounded-md"
-                      style={{
-                        backgroundColor: gradeConfig.bgColor,
-                        color: gradeConfig.color,
-                      }}
+                      className={`flex items-center gap-2 text-sm mt-2 p-2 rounded-md ${gradeConfig.blockClass} ${gradeConfig.textClass}`}
                     >
                       <TrendingDown className="h-4 w-4" />
                       <span className="font-medium">

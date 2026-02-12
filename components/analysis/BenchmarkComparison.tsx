@@ -30,22 +30,30 @@ export function BenchmarkComparison({ analyses }: BenchmarkComparisonProps) {
     heavy: {
       label: '헤비 유저',
       color: '#8b5cf6',
-      bgColor: '#f5f3ff',
+      badgeClass: 'bg-violet-100 text-violet-700 border-violet-300 dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-700',
+      blockClass: 'bg-violet-50 border-violet-200 dark:bg-violet-950/30 dark:border-violet-800',
+      textClass: 'text-violet-600 dark:text-violet-400',
     },
     average: {
       label: '평균 수준',
       color: '#22c55e',
-      bgColor: '#f0fdf4',
+      badgeClass: 'bg-green-100 text-green-700 border-green-300 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700',
+      blockClass: 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800',
+      textClass: 'text-green-600 dark:text-green-400',
     },
     below: {
       label: '평균 이하',
       color: '#f59e0b',
-      bgColor: '#fefce8',
+      badgeClass: 'bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-700',
+      blockClass: 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800',
+      textClass: 'text-amber-600 dark:text-amber-400',
     },
     minimal: {
       label: '거의 미사용',
       color: '#ef4444',
-      bgColor: '#fef2f2',
+      badgeClass: 'bg-red-100 text-red-700 border-red-300 dark:bg-red-900/40 dark:text-red-300 dark:border-red-700',
+      blockClass: 'bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800',
+      textClass: 'text-red-600 dark:text-red-400',
     },
   };
 
@@ -81,11 +89,7 @@ export function BenchmarkComparison({ analyses }: BenchmarkComparisonProps) {
                     </p>
                   </div>
                   <Badge
-                    style={{
-                      backgroundColor: config.bgColor,
-                      color: config.color,
-                      borderColor: config.color,
-                    }}
+                    className={config.badgeClass}
                   >
                     {config.label}
                   </Badge>
@@ -132,7 +136,7 @@ export function BenchmarkComparison({ analyses }: BenchmarkComparisonProps) {
                   </div>
 
                   <div className="text-center pt-2 border-t">
-                    <span className="text-lg font-bold" style={{ color: config.color }}>
+                    <span className={`text-lg font-bold ${config.textClass}`}>
                       평균 대비 {benchmark!.percentOfAverage}%
                     </span>
                   </div>

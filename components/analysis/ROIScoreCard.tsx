@@ -46,12 +46,7 @@ export function ROIScoreCard({ analysis }: ROIScoreCardProps) {
             </div>
           </div>
           <Badge
-            style={{
-              backgroundColor: gradeConfig.bgColor,
-              color: gradeConfig.color,
-              borderColor: gradeConfig.color,
-            }}
-            className="text-lg font-bold"
+            className={`text-lg font-bold ${gradeConfig.badgeClass}`}
           >
             {gradeConfig.emoji} {analysis.grade}
           </Badge>
@@ -61,7 +56,7 @@ export function ROIScoreCard({ analysis }: ROIScoreCardProps) {
         <div>
           <div className="flex items-center justify-between text-sm mb-2">
             <span className="text-muted-foreground">가성비 점수</span>
-            <span className="font-semibold" style={{ color: gradeConfig.color }}>
+            <span className={`font-semibold ${gradeConfig.textClass}`}>
               {gradeConfig.label}
             </span>
           </div>
@@ -84,11 +79,7 @@ export function ROIScoreCard({ analysis }: ROIScoreCardProps) {
         </div>
 
         <div
-          className="rounded-lg border p-3 flex items-start gap-2"
-          style={{
-            backgroundColor: gradeConfig.bgColor,
-            borderColor: gradeConfig.color,
-          }}
+          className={`rounded-lg border p-3 flex items-start gap-2 ${gradeConfig.blockClass}`}
         >
           {getRecommendIcon()}
           <div className="flex-1">
@@ -97,7 +88,7 @@ export function ROIScoreCard({ analysis }: ROIScoreCardProps) {
               {analysis.recommendationReason}
             </p>
             {analysis.potentialSavings > 0 && (
-              <p className="text-sm font-semibold mt-2" style={{ color: gradeConfig.color }}>
+              <p className={`text-sm font-semibold mt-2 ${gradeConfig.textClass}`}>
                 절약 가능 금액: 월 {formatKRW(analysis.potentialSavings)}
               </p>
             )}
