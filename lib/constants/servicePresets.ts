@@ -50,7 +50,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.netflix.com/cancelplan',
     brandColor: '#E50914',
     domain: 'netflix.com',
-    logoUrl: 'https://logo.clearbit.com/netflix.com',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://netflix.com&size=128',
   },
   '디즈니+': {
     name: '디즈니+',
@@ -71,7 +71,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.disneyplus.com/account',
     brandColor: '#113CCF',
     domain: 'disneyplus.com',
-    logoUrl: 'https://logo.clearbit.com/disneyplus.com',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://disneyplus.com&size=128',
   },
   웨이브: {
     name: '웨이브',
@@ -165,7 +165,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://support.apple.com/ko-kr/111771',
     brandColor: '#000000',
     domain: 'tv.apple.com',
-    logoUrl: 'https://logo.clearbit.com/apple.com',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://apple.com&size=128',
   },
   'Amazon Prime': {
     name: 'Amazon Prime',
@@ -179,7 +179,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.amazon.co.kr/gp/primecentral',
     brandColor: '#00A8E1',
     domain: 'primevideo.com',
-    logoUrl: 'https://logo.clearbit.com/amazon.com',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://amazon.com&size=128',
   },
   유튜브프리미엄: {
     name: '유튜브 프리미엄',
@@ -199,7 +199,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.youtube.com/paid_memberships',
     brandColor: '#FF0000',
     domain: 'youtube.com',
-    logoUrl: 'https://logo.clearbit.com/youtube.com',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://youtube.com&size=128',
   },
 
   /* ── 음악 ────────────────────────────────────────────────── */
@@ -221,7 +221,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.spotify.com/account/subscription/',
     brandColor: '#1DB954',
     domain: 'spotify.com',
-    logoUrl: 'https://logo.clearbit.com/spotify.com',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://spotify.com&size=128',
   },
   'Apple Music': {
     name: 'Apple Music',
@@ -242,7 +242,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://support.apple.com/ko-kr/108380',
     brandColor: '#FA2D48',
     domain: 'music.apple.com',
-    logoUrl: 'https://logo.clearbit.com/apple.com',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://apple.com&size=128',
   },
   '지니뮤직': {
     name: '지니뮤직',
@@ -304,7 +304,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.youtube.com/paid_memberships',
     brandColor: '#FF0000',
     domain: 'music.youtube.com',
-    logoUrl: 'https://logo.clearbit.com/youtube.com',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://youtube.com&size=128',
   },
 
   /* ── 쇼핑/배달 ──────────────────────────────────────────── */
@@ -388,7 +388,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://account.microsoft.com/services',
     brandColor: '#D83B01',
     domain: 'microsoft.com',
-    logoUrl: 'https://logo.clearbit.com/microsoft.com',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://microsoft.com&size=128',
   },
   노션: {
     name: '노션',
@@ -403,7 +403,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://www.notion.so/my-account/plans',
     brandColor: '#000000',
     domain: 'notion.so',
-    logoUrl: 'https://logo.clearbit.com/notion.so',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://notion.so&size=128',
   },
   ChatGPT: {
     name: 'ChatGPT',
@@ -418,7 +418,7 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     cancellationUrl: 'https://chat.openai.com/settings/subscription',
     brandColor: '#10A37F',
     domain: 'openai.com',
-    logoUrl: 'https://logo.clearbit.com/openai.com',
+    logoUrl: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://openai.com&size=128',
   },
   'Claude Pro': {
     name: 'Claude Pro',

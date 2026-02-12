@@ -10,19 +10,16 @@ interface BrandIconProps {
 }
 
 /**
- * Build favicon URL list with Clearbit Logo API as priority for high-quality company logos.
- * Fallback order: logoUrl (preset override) → Clearbit → icon.horse → Google FaviconV2 → Google S2.
+ * Build favicon URL list.
+ * Fallback order: logoUrl (preset) → Google FaviconV2 (128px) → icon.horse → Google S2.
  */
 function getFaviconUrls(domain: string, logoUrl?: string): string[] {
   const urls: string[] = [];
   if (logoUrl) urls.push(logoUrl);
 
-  // Clearbit gives high-quality company logos (not just favicons)
-  const clearbitDomain = domain.replace(/^www\./, '').replace(/^m\./, '');
   urls.push(
-    `https://logo.clearbit.com/${clearbitDomain}`,
-    `https://icon.horse/icon/${domain}?size=large`,
     `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${domain}&size=128`,
+    `https://icon.horse/icon/${domain}?size=large`,
     `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
   );
   return urls;
