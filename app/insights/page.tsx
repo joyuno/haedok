@@ -5,7 +5,6 @@ import {
   SubscriptionDNA,
   DNARadarChart,
   CostFeelingMeter,
-  OpportunityCostSimulator,
   ChallengeTracker,
   SubscriptionTimeline,
   OptimalPortfolio,
@@ -93,14 +92,7 @@ export default function InsightsPage() {
 
         <div className="border-t border-border" />
 
-        {/* Section 3: Opportunity Cost Simulator */}
-        <section>
-          <OpportunityCostSimulator />
-        </section>
-
-        <div className="border-t border-border" />
-
-        {/* Section 3.5: Stock Investment Simulation */}
+        {/* Section 3: 만약에 계산기 (실제 주가 기반 투자 시뮬레이션) */}
         <section>
           <StockInvestmentChart />
         </section>
