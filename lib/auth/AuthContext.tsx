@@ -93,19 +93,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const deleteAccount = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
-    // Delete user's party messages
-    await supabase.from('party_messages').delete().eq('sender_id', user.id);
-    // Delete user's party applications
-    await supabase.from('party_applications').delete().eq('applicant_id', user.id);
-    // Delete user's party posts
-    await supabase.from('public_party_posts').delete().eq('author_id', user.id);
-    // Delete user's subscriptions
-    await supabase.from('subscriptions').delete().eq('user_id', user.id);
-    // Delete user's usage records
-    await supabase.from('usage_records').delete().eq('user_id', user.id);
-    // Delete profile
-    await supabase.from('profiles').delete().eq('id', user.id);
-    // Sign out
+    // FK CASCADE가 설정되어 있어 profiles 삭제 시 연관 데이터 자동 삭제:
+    // profiles → subscriptions, usage_records, public_party_posts, party_applications, party_messages
+    const { error } = await supabase.from('profiles').delete().eq('id', user.id);
+    if (error) {
+      console.error('[Supabase] 회원 탈퇴 실패:', error.message);
+      return false;
+    }
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
