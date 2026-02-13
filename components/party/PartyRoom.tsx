@@ -38,6 +38,15 @@ import {
   Megaphone,
 } from 'lucide-react';
 
+function generateInviteCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
 interface PartyRoomProps {
   party: {
     id: string;
@@ -130,6 +139,20 @@ export function PartyRoom({ party, onBack }: PartyRoomProps) {
 
   // Live party data
   const [liveParty, setLiveParty] = useState(party);
+
+  // Auto-generate invite code if missing
+  useEffect(() => {
+    if (!liveParty.invite_code && isOwner) {
+      const newCode = generateInviteCode();
+      setLiveParty(prev => ({ ...prev, invite_code: newCode }));
+      supabase.from('public_party_posts')
+        .update({ invite_code: newCode })
+        .eq('id', liveParty.id)
+        .then(({ error }) => {
+          if (error) console.error('[Supabase] invite_code 업데이트 실패:', error.message);
+        });
+    }
+  }, [liveParty.invite_code, liveParty.id, isOwner]);
 
   const handleCopy = async (text: string, field: string) => {
     await navigator.clipboard.writeText(text);
@@ -280,7 +303,7 @@ export function PartyRoom({ party, onBack }: PartyRoomProps) {
 
   const latestNotice = [...messages].reverse().find(m => m.type === 'notice');
   const pendingCount = pendingApps.filter(a => a.status === 'pending').length;
-  const qrUrl = typeof window !== 'undefined'
+  const qrUrl = typeof window !== 'undefined' && liveParty.invite_code
     ? `${window.location.origin}/party?code=${liveParty.invite_code}`
     : '';
 
@@ -608,7 +631,13 @@ export function PartyRoom({ party, onBack }: PartyRoomProps) {
           </DialogHeader>
           <div className="flex flex-col items-center space-y-4 py-4">
             <div className="bg-white p-4 rounded-2xl">
-              <QRCodeSVG value={qrUrl} size={200} level="M" />
+              {qrUrl ? (
+                <QRCodeSVG value={qrUrl} size={200} level="M" />
+              ) : (
+                <div className="w-[200px] h-[200px] flex items-center justify-center bg-muted rounded-xl">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              )}
             </div>
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">

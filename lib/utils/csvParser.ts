@@ -92,10 +92,13 @@ export function parseCSV(csvString: string): {
 } {
   const errors: string[] = [];
 
-  const result = Papa.parse<Record<string, string>>(csvString, {
+  // Strip BOM if present
+  const cleanedCSV = csvString.replace(/^\uFEFF/, '');
+
+  const result = Papa.parse<Record<string, string>>(cleanedCSV, {
     header: true,
     skipEmptyLines: true,
-    transformHeader: (h: string) => h.trim(),
+    transformHeader: (h: string) => h.trim().replace(/^\uFEFF/, ''),
   });
 
   if (result.errors.length > 0) {

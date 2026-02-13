@@ -112,19 +112,22 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
     new Set(parsedEntries.map((e) => e.appName)),
   );
 
+  const unmappedCount = uniqueAppNames.filter(name => !mapping[name]).length;
+
   const handleDownloadTemplate = () => {
     const activeNames = subscriptions
       .filter((s) => s.status === 'active' || s.status === 'trial')
       .map((s) => s.name);
 
-    // Use format that matches the parser expectations
     const header = 'App Name,Date,Usage Time';
     const today = new Date().toISOString().split('T')[0];
 
+    const exampleTimes = ['3h 30m', '5h 0m', '1h 45m', '7h 0m', '2h 15m', '4h 0m'];
+
     const rows = activeNames.length > 0
-      ? activeNames.map((name) => `${name},${today},0h 0m`)
+      ? activeNames.map((name, i) => `${name},${today},${exampleTimes[i % exampleTimes.length]}`)
       : [
-          `넷플릭스,${today},3h 0m`,
+          `넷플릭스,${today},3h 30m`,
           `유튜브 프리미엄,${today},7h 0m`,
           `스포티파이,${today},5h 0m`
         ];
@@ -134,7 +137,7 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'haedok_usage_template.csv';
+    a.download = 'subscout_usage_template.csv';
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -236,6 +239,13 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
               <p className="text-xs text-muted-foreground">
                 CSV의 앱 이름과 등록된 구독을 연결해주세요
               </p>
+              {unmappedCount > 0 && (
+                <div className="p-3 bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-800 rounded-lg">
+                  <p className="text-sm text-amber-800 dark:text-amber-300">
+                    {unmappedCount}개 앱이 매칭되지 않았습니다. 매칭되지 않은 앱의 데이터는 가져오지 않습니다.
+                  </p>
+                </div>
+              )}
               {uniqueAppNames.map((appName) => (
                 <div key={appName} className="flex items-center gap-3">
                   <div className="flex-1 font-medium text-sm">{appName}</div>
@@ -302,7 +312,7 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
                 ? '가져오는 중...'
                 : importResult !== null
                   ? '완료'
-                  : `${Object.keys(mapping).length}개 데이터 가져오기`}
+                  : `${Object.keys(mapping).length}/${uniqueAppNames.length}개 앱 데이터 가져오기`}
             </Button>
           </>
         )}
