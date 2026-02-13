@@ -18,10 +18,11 @@ import {
   BenchmarkComparison,
   CsvUploader,
   SavingsReport,
+  PersonalizedROICalculator,
 } from '@/components/analysis';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { useUsageStore } from '@/stores/usageStore';
-import { PackageOpen, TrendingUp, Upload, Sparkles, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
+import { PackageOpen, TrendingUp, Upload, Sparkles, RefreshCw, ChevronDown, ChevronUp, Calculator } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AnalysisPage() {
@@ -260,7 +261,7 @@ export default function AnalysisPage() {
       </Card>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 rounded-xl p-1.5 bg-accent overflow-x-auto">
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 rounded-xl p-1.5 bg-accent overflow-x-auto">
           <TabsTrigger value="overview" className="rounded-lg font-semibold">
             개요
           </TabsTrigger>
@@ -275,6 +276,10 @@ export default function AnalysisPage() {
           </TabsTrigger>
           <TabsTrigger value="benchmark" className="rounded-lg font-semibold">
             평균 비교
+          </TabsTrigger>
+          <TabsTrigger value="personalized" className="rounded-lg font-semibold">
+            <Calculator className="mr-1 h-3.5 w-3.5" />
+            맞춤 계산
           </TabsTrigger>
           <TabsTrigger value="savings" className="rounded-lg font-semibold">
             <Sparkles className="mr-1 h-3.5 w-3.5" />
@@ -300,6 +305,10 @@ export default function AnalysisPage() {
 
         <TabsContent value="benchmark">
           <BenchmarkComparison analyses={roiAnalyses} />
+        </TabsContent>
+
+        <TabsContent value="personalized">
+          <PersonalizedROICalculator />
         </TabsContent>
 
         <TabsContent value="savings">

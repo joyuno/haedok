@@ -15,6 +15,21 @@ export interface FamilyPlan {
   currency?: 'KRW' | 'USD';
 }
 
+export interface PersonalizedROIField {
+  key: string;           // 'monthlySpending', 'orderCount', etc.
+  label: string;         // '월 카드 결제액'
+  unit: string;          // '원', '회', '건'
+  placeholder: string;   // '500000'
+  type: 'currency' | 'number';
+  defaultValue?: number;
+}
+
+export interface PersonalizedROIConfig {
+  fields: PersonalizedROIField[];
+  calculate: string; // function name reference - we'll use a separate calculation module
+  description: string; // 계산 방식 설명
+}
+
 export interface ServicePreset {
   name: string;
   category: SubscriptionCategory;
@@ -27,6 +42,7 @@ export interface ServicePreset {
   domain?: string;
   /** Direct logo URL override — used when favicon APIs return low-quality icons */
   logoUrl?: string;
+  personalizedROI?: PersonalizedROIConfig;
 }
 
 export const SERVICE_PRESETS: Record<string, ServicePreset> = {
@@ -319,6 +335,19 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     brandColor: '#E6282E',
     domain: 'coupang.com',
     logoUrl: 'https://icon.horse/icon/coupang.com?size=large',
+    personalizedROI: {
+      fields: [
+        {
+          key: 'orderCount',
+          label: '월 로켓배송 주문 횟수',
+          unit: '회',
+          placeholder: '8',
+          type: 'number',
+        },
+      ],
+      calculate: 'coupangWow',
+      description: '주문당 배송비 약 ₩3,000 절약 + 쿠팡이츠 무료배달',
+    },
   },
   '네이버 플러스': {
     name: '네이버 플러스',
@@ -331,6 +360,19 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     brandColor: '#03C75A',
     domain: 'naver.com',
     logoUrl: 'https://icon.horse/icon/naver.com?size=large',
+    personalizedROI: {
+      fields: [
+        {
+          key: 'monthlySpending',
+          label: '월 네이버페이 결제액',
+          unit: '원',
+          placeholder: '300000',
+          type: 'currency',
+        },
+      ],
+      calculate: 'naverPlus',
+      description: '결제액 최대 4% 추가 적립',
+    },
   },
   '배민클럽': {
     name: '배민클럽',
@@ -343,6 +385,19 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     brandColor: '#2AC1BC',
     domain: 'baemin.com',
     logoUrl: 'https://icon.horse/icon/baemin.com?size=large',
+    personalizedROI: {
+      fields: [
+        {
+          key: 'orderCount',
+          label: '월 배달 주문 횟수',
+          unit: '회',
+          placeholder: '5',
+          type: 'number',
+        },
+      ],
+      calculate: 'baeminClub',
+      description: '주문당 배달비 약 ₩3,000 절약',
+    },
   },
   'SSG 멤버십': {
     name: 'SSG 멤버십',
@@ -355,6 +410,19 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     brandColor: '#FF5A2E',
     domain: 'ssg.com',
     logoUrl: 'https://icon.horse/icon/ssg.com?size=large',
+    personalizedROI: {
+      fields: [
+        {
+          key: 'orderCount',
+          label: '월 이마트/SSG 주문 횟수',
+          unit: '회',
+          placeholder: '4',
+          type: 'number',
+        },
+      ],
+      calculate: 'ssgMembership',
+      description: '주문당 배송비 약 ₩3,000 절약 + 할인 혜택',
+    },
   },
   '컬리패스': {
     name: '컬리패스',
@@ -367,6 +435,19 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     brandColor: '#5F0080',
     domain: 'kurly.com',
     logoUrl: 'https://icon.horse/icon/kurly.com?size=large',
+    personalizedROI: {
+      fields: [
+        {
+          key: 'orderCount',
+          label: '월 컬리 주문 횟수',
+          unit: '회',
+          placeholder: '4',
+          type: 'number',
+        },
+      ],
+      calculate: 'kurlyPass',
+      description: '주문당 배송비 약 ₩3,000 절약 + 적립 혜택',
+    },
   },
 
   /* ── 생산성 ──────────────────────────────────────────────── */
@@ -744,6 +825,19 @@ export const SERVICE_PRESETS: Record<string, ServicePreset> = {
     brandColor: '#0064FF',
     domain: 'toss.im',
     logoUrl: 'https://icon.horse/icon/toss.im?size=large',
+    personalizedROI: {
+      fields: [
+        {
+          key: 'monthlySpending',
+          label: '월 카드 결제 총액',
+          unit: '원',
+          placeholder: '500000',
+          type: 'currency',
+        },
+      ],
+      calculate: 'tossPrime',
+      description: '결제액 4% 적립 (100만원 초과분 1%)',
+    },
   },
 };
 
