@@ -37,10 +37,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        fetchProfile(session.user.id);
+        setUser(session.user);
+        await fetchProfile(session.user.id);
+      } else {
+        // 세션이 없으면 익명 로그인으로 자동 생성
+        try {
+          const { data, error } = await supabase.auth.signInAnonymously();
+          if (!error && data?.user) {
+            setUser(data.user);
+            // 익명 사용자용 프로필 생성
+            await supabase.from('profiles').upsert({
+              id: data.user.id,
+              nickname: `사용자_${data.user.id.slice(0, 6)}`,
+            }, { onConflict: 'id' });
+            await fetchProfile(data.user.id);
+          }
+        } catch (e) {
+          console.error('[Auth] 익명 로그인 실패:', e);
+        }
       }
       setLoading(false);
     });

@@ -139,9 +139,9 @@ export default function DashboardPage() {
         </section>
 
         {/* Upcoming Payments */}
-        <section className="bg-card rounded-2xl border border-border p-6 lg:p-7" aria-label="이번 달 결제 일정">
+        <section className="bg-card rounded-2xl border border-border p-6 lg:p-7" aria-label="다음 달 결제 일정">
           <h2 className="text-xl font-bold text-foreground mb-5">
-            이번 달 결제 일정
+            다음 달 결제 일정
           </h2>
           <PaymentCalendar subscriptions={subscriptions} />
         </section>

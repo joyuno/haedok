@@ -5,37 +5,50 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { useUsageStore } from '@/stores/usageStore';
-import { calculateMonthlyPrice } from '@/lib/calculations/costAnalysis';
 import type { Subscription, SubscriptionCategory, BillingCycle, SubscriptionStatus, UsageMetricType } from '@/lib/types/subscription';
 import type { WeeklyUsage } from '@/lib/types/usage';
 
 /**
- * Syncs Zustand stores with Supabase when user is logged in.
- * - On login: loads data from Supabase into Zustand stores
- * - On data change: saves to Supabase
- * - Non-logged-in users continue using localStorage only
+ * Supabase를 단일 데이터 소스로 사용하는 동기화 훅.
+ * - 로그인 시: Supabase에서 데이터를 로드하여 Zustand 스토어에 설정
+ * - 로그아웃 시: Zustand 스토어를 초기화 (빈 상태)
+ * - localStorage는 사용하지 않음
  */
 export function useSupabaseSync() {
   const { user } = useAuth();
   const synced = useRef(false);
+  const prevUserId = useRef<string | null>(null);
 
   useEffect(() => {
+    // 로그아웃 감지: 이전에 user가 있었는데 지금 null이면 스토어 초기화
     if (!user) {
+      if (prevUserId.current) {
+        useSubscriptionStore.getState().reset();
+        useUsageStore.getState().reset();
+        console.log('[Sync] 로그아웃 감지 → 스토어 초기화');
+      }
+      prevUserId.current = null;
       synced.current = false;
       return;
     }
-    if (synced.current) return;
-    synced.current = true;
 
-    // Load subscriptions from Supabase
+    // 같은 유저면 중복 sync 방지
+    if (synced.current && prevUserId.current === user.id) return;
+    synced.current = true;
+    prevUserId.current = user.id;
+
+    // Supabase에서 데이터 로드
     (async () => {
-      const { data: subs } = await supabase
+      // 1) 구독 데이터 로드
+      const { data: subs, error: subsError } = await supabase
         .from('subscriptions')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true });
 
-      if (subs && subs.length > 0) {
+      if (subsError) {
+        console.error('[Sync] 구독 로드 실패:', subsError.message);
+      } else if (subs && subs.length > 0) {
         const mapped: Subscription[] = subs.map((s) => ({
           id: s.id,
           name: s.name,
@@ -54,17 +67,24 @@ export function useSupabaseSync() {
           createdAt: s.created_at,
           updatedAt: s.updated_at,
         }));
-        useSubscriptionStore.setState({ subscriptions: mapped });
+        const cancelled = mapped.filter(s => s.status === 'cancelled');
+        useSubscriptionStore.setState({ subscriptions: mapped, cancelledSubscriptions: cancelled });
+        console.log(`[Sync] Supabase → 구독 ${mapped.length}건 로드`);
+      } else {
+        // Supabase가 비어있으면 빈 상태 유지
+        useSubscriptionStore.setState({ subscriptions: [], cancelledSubscriptions: [] });
       }
 
-      // Load usage records from Supabase
-      const { data: usage } = await supabase
+      // 2) 이용률 데이터 로드
+      const { data: usage, error: usageError } = await supabase
         .from('usage_records')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true });
 
-      if (usage && usage.length > 0) {
+      if (usageError) {
+        console.error('[Sync] 이용률 로드 실패:', usageError.message);
+      } else if (usage && usage.length > 0) {
         const mapped: WeeklyUsage[] = usage.map((u) => ({
           id: u.id,
           subscriptionId: u.subscription_id,
@@ -75,6 +95,9 @@ export function useSupabaseSync() {
           createdAt: u.created_at,
         }));
         useUsageStore.setState({ usageRecords: mapped });
+        console.log(`[Sync] Supabase → 이용률 ${mapped.length}건 로드`);
+      } else {
+        useUsageStore.setState({ usageRecords: [] });
       }
     })();
   }, [user]);
