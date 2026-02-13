@@ -51,3 +51,28 @@ export const CATEGORY_COLORS: Record<SubscriptionCategory, string> = {
   reading: '#6366f1',
   other: '#6b7280',
 };
+
+/**
+ * 카테고리별 사용량 측정 방식
+ * - time: 주간 이용 시간 (영상, 음악, 게임)
+ * - count: 월간 이용 횟수 (쇼핑, 배달)
+ * - frequency: 주 사용 일수 (클라우드, 생산성, 독서, 기타)
+ */
+export type UsageMetricType = 'time' | 'count' | 'frequency';
+
+export const CATEGORY_METRIC: Record<SubscriptionCategory, UsageMetricType> = {
+  video: 'time',
+  music: 'time',
+  cloud: 'frequency',
+  productivity: 'frequency',
+  shopping: 'count',
+  gaming: 'time',
+  reading: 'frequency',
+  other: 'frequency',
+};
+
+export const METRIC_LABELS: Record<UsageMetricType, { unit: string; inputLabel: string; inputPlaceholder: string; perLabel: string }> = {
+  time: { unit: '시간', inputLabel: '주간 사용 시간', inputPlaceholder: '0', perLabel: '시간당' },
+  count: { unit: '회', inputLabel: '월간 이용 횟수', inputPlaceholder: '0', perLabel: '회당' },
+  frequency: { unit: '일', inputLabel: '주 사용 일수', inputPlaceholder: '0', perLabel: '일당' },
+};

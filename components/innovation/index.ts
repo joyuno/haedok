@@ -3,8 +3,5 @@ export { DNAShareCard } from './DNAShareCard';
 export { DNARadarChart } from './DNARadarChart';
 export { CostFeelingMeter } from './CostFeelingMeter';
 export { OpportunityCostSimulator } from './OpportunityCostSimulator';
-export { ChallengeTracker } from './ChallengeTracker';
 export { SubscriptionTimeline } from './SubscriptionTimeline';
-export { OptimalPortfolio } from './OptimalPortfolio';
-export { PatternPredictor } from './PatternPredictor';
 export { StockInvestmentChart } from './StockInvestmentChart';

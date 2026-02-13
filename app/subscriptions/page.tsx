@@ -41,10 +41,10 @@ export default function SubscriptionsPage() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <main className="container mx-auto px-4 py-8 max-w-5xl">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-4xl font-bold mb-2">구독 관리</h1>
+          <h1 className="text-2xl sm:text-4xl font-bold mb-2">구독 관리</h1>
           <p className="text-muted-foreground text-lg">
             모든 구독을 한 곳에서 관리하세요
           </p>
@@ -87,7 +87,7 @@ export default function SubscriptionsPage() {
                 <p className="text-sm text-muted-foreground font-medium mb-2">
                   총 구독 수
                 </p>
-                <p className="text-5xl font-bold">{subscriptionCount}개</p>
+                <p className="text-3xl sm:text-5xl font-bold">{subscriptionCount}개</p>
               </CardContent>
             </Card>
             <Card className="rounded-2xl border-border">
@@ -95,7 +95,7 @@ export default function SubscriptionsPage() {
                 <p className="text-sm text-muted-foreground font-medium mb-2">
                   월 총 결제 금액
                 </p>
-                <p className="text-5xl font-bold">
+                <p className="text-3xl sm:text-5xl font-bold">
                   {formatKRW(totalMonthlyCost)}
                 </p>
               </CardContent>
@@ -124,6 +124,6 @@ export default function SubscriptionsPage() {
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   );
 }

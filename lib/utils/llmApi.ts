@@ -5,6 +5,41 @@
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
+/** Rate Limiting — 분당 최대 10회, 최소 간격 2초 */
+const RATE_LIMIT = {
+  maxPerMinute: 10,
+  minIntervalMs: 2000,
+};
+
+const callTimestamps: number[] = [];
+let lastCallTime = 0;
+
+function checkRateLimit(): string | null {
+  const now = Date.now();
+
+  // 최소 간격 체크
+  if (now - lastCallTime < RATE_LIMIT.minIntervalMs) {
+    return `요청이 너무 빠릅니다. ${Math.ceil((RATE_LIMIT.minIntervalMs - (now - lastCallTime)) / 1000)}초 후 다시 시도해주세요.`;
+  }
+
+  // 분당 호출 수 체크
+  const oneMinuteAgo = now - 60_000;
+  while (callTimestamps.length > 0 && callTimestamps[0] < oneMinuteAgo) {
+    callTimestamps.shift();
+  }
+  if (callTimestamps.length >= RATE_LIMIT.maxPerMinute) {
+    return '분당 요청 한도(10회)를 초과했습니다. 잠시 후 다시 시도해주세요.';
+  }
+
+  return null;
+}
+
+function recordCall(): void {
+  const now = Date.now();
+  lastCallTime = now;
+  callTimestamps.push(now);
+}
+
 interface LLMMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
@@ -27,14 +62,26 @@ export async function callLLM(messages: LLMMessage[]): Promise<LLMResponse> {
     };
   }
 
+  // Rate limit 체크
+  const rateLimitError = checkRateLimit();
+  if (rateLimitError) {
+    return {
+      success: false,
+      content: '',
+      error: rateLimitError,
+    };
+  }
+
+  recordCall();
+
   try {
     const response = await fetch(OPENROUTER_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://subscout-five.vercel.app',
-        'X-Title': 'SubScout',
+        'HTTP-Referer': 'https://haedok-five.vercel.app',
+        'X-Title': '해독',
       },
       body: JSON.stringify({
         model: 'google/gemini-2.0-flash-001',

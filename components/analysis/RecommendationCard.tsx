@@ -84,7 +84,7 @@ export function RecommendationCard({ analyses }: RecommendationCardProps) {
         <Card key={group.action}>
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
-              <div className={group.textClass}>{group.icon}</div>
+              <div className={group.textClass} aria-hidden="true">{group.icon}</div>
               <CardTitle className="text-lg">{group.title}</CardTitle>
               <Badge variant="secondary">{group.analyses.length}개</Badge>
             </div>
@@ -132,7 +132,7 @@ export function RecommendationCard({ analyses }: RecommendationCardProps) {
                                   variant="outline"
                                   className={`border-current ${group.textClass}`}
                                 >
-                                  {actionLabel[group.action]} <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                                  {actionLabel[group.action]} <ExternalLink className="w-3.5 h-3.5 ml-1" aria-hidden="true" />
                                 </Button>
                               </a>
                             ) : (

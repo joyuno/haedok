@@ -33,9 +33,9 @@ export function AndroidGuide() {
     },
     {
       number: 5,
-      title: 'SubScout에 입력',
+      title: '해독에 입력',
       description:
-        '구독 앱의 사용 시간을 SubScout 대시보드에 입력하여 가치를 분석하세요.',
+        '구독 앱의 사용 시간을 해독 대시보드에 입력하여 가치를 분석하세요.',
       icon: '✅',
     },
   ];
@@ -85,7 +85,7 @@ export function AndroidGuide() {
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <div className="rounded-full bg-green-500/10 p-3">
-              <Smartphone className="h-8 w-8 text-green-600" />
+              <Smartphone className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-bold mb-2">
@@ -131,7 +131,7 @@ export function AndroidGuide() {
       <Card className="border-2 border-blue-200 dark:border-blue-800">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Download className="h-5 w-5 text-blue-600" />
+            <Download className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             <h3 className="text-lg font-semibold">보너스: 추천 서드파티 앱</h3>
           </div>
           <p className="text-sm text-muted-foreground mb-4">

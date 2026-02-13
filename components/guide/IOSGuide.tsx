@@ -38,9 +38,9 @@ export function IOSGuide() {
     },
     {
       number: 6,
-      title: 'SubScout에 입력',
+      title: '해독에 입력',
       description:
-        '구독 앱의 사용 시간을 SubScout 대시보드에 입력하여 가치를 분석하세요.',
+        '구독 앱의 사용 시간을 해독 대시보드에 입력하여 가치를 분석하세요.',
       icon: '✅',
     },
   ];
@@ -74,7 +74,7 @@ export function IOSGuide() {
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <div className="rounded-full bg-blue-500/10 p-3">
-              <Smartphone className="h-8 w-8 text-blue-600" />
+              <Smartphone className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-bold mb-2">iOS 스크린 타임 가이드</h3>

@@ -24,7 +24,7 @@ interface DNAShareCardProps {
 }
 
 const CARD_W = 400;
-const CARD_H = 600;
+const CARD_H = 560;
 
 function roundRect(
   ctx: CanvasRenderingContext2D,
@@ -64,88 +64,122 @@ function drawCard(
   canvas.style.height = `${CARD_H}px`;
   ctx.scale(dpr, dpr);
 
-  // Background gradient
+  // Background gradient -- premium dark navy to deep blue to subtle teal
   const gradient = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
-  gradient.addColorStop(0, '#3182F6');
-  gradient.addColorStop(0.5, '#4B92F7');
-  gradient.addColorStop(1, '#1E6FE6');
+  gradient.addColorStop(0, '#0F172A');
+  gradient.addColorStop(0.5, '#1E3A5F');
+  gradient.addColorStop(1, '#0D4044');
   ctx.fillStyle = gradient;
   roundRect(ctx, 0, 0, CARD_W, CARD_H, 24);
   ctx.fill();
 
-  // Subtle decorative circles
-  ctx.globalAlpha = 0.08;
-  ctx.fillStyle = '#FFFFFF';
-  ctx.beginPath();
-  ctx.arc(320, 80, 100, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(60, 520, 80, 0, Math.PI * 2);
-  ctx.fill();
+  // Subtle grid pattern instead of decorative circles
+  ctx.globalAlpha = 0.04;
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x <= CARD_W; x += 32) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, CARD_H);
+    ctx.stroke();
+  }
+  for (let y = 0; y <= CARD_H; y += 32) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(CARD_W, y);
+    ctx.stroke();
+  }
   ctx.globalAlpha = 1;
 
-  // DNA Emoji (large)
-  ctx.font = '64px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+  // DNA Emoji (slightly smaller, positioned higher)
+  ctx.font = '52px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(dnaProfile.emoji, CARD_W / 2, 90);
+  ctx.fillText(dnaProfile.emoji, CARD_W / 2, 70);
 
-  // DNA Type Name
-  ctx.font = 'bold 28px -apple-system, "Segoe UI", sans-serif';
+  // DNA Type Name -- larger with letter-spacing
+  ctx.font = 'bold 32px -apple-system, "Segoe UI", sans-serif';
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
-  ctx.fillText(dnaProfile.name, CARD_W / 2, 135);
+  // Simulate letter-spacing by drawing each character with offset
+  const nameText = dnaProfile.name;
+  const letterSpacing = 1.5;
+  const nameWidth = ctx.measureText(nameText).width + (nameText.length - 1) * letterSpacing;
+  let nameX = (CARD_W - nameWidth) / 2;
+  for (const char of nameText) {
+    ctx.textAlign = 'left';
+    ctx.fillText(char, nameX, 120);
+    nameX += ctx.measureText(char).width + letterSpacing;
+  }
+  ctx.textAlign = 'center';
 
-  // Stats pill area
-  const pillY = 160;
+  // Stats pill -- refined with border
+  const pillY = 148;
   const costText = `월 ${formatKRW(totalCost)}`;
   const countText = `구독 ${subscriptionCount}개`;
   const statsText = `${costText}  |  ${countText}`;
 
-  ctx.font = '600 14px -apple-system, "Segoe UI", sans-serif';
-  const statsW = ctx.measureText(statsText).width + 40;
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-  roundRect(ctx, (CARD_W - statsW) / 2, pillY - 14, statsW, 32, 16);
+  ctx.font = '600 13px -apple-system, "Segoe UI", sans-serif';
+  const statsW = ctx.measureText(statsText).width + 36;
+  const pillX = (CARD_W - statsW) / 2;
+  const pillH = 30;
+
+  // Pill background
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+  roundRect(ctx, pillX, pillY - 13, statsW, pillH, 15);
   ctx.fill();
+
+  // Pill border
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, pillX, pillY - 13, statsW, pillH, 15);
+  ctx.stroke();
 
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
   ctx.fillText(statsText, CARD_W / 2, pillY + 5);
 
-  // Inner card background
+  // Inner card background -- more subtle with border
   const cardX = 24;
-  const cardY = 210;
+  const cardY = 192;
   const cardW = CARD_W - 48;
-  const cardH = 300;
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+  const cardH = 270;
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
   roundRect(ctx, cardX, cardY, cardW, cardH, 16);
   ctx.fill();
 
-  // Category section title
-  ctx.font = 'bold 13px -apple-system, "Segoe UI", sans-serif';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-  ctx.textAlign = 'left';
-  ctx.fillText('카테고리별 지출', cardX + 20, cardY + 30);
+  // Inner card border
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, cardX, cardY, cardW, cardH, 16);
+  ctx.stroke();
 
-  // Category bars (top 5)
+  // Category section title
+  ctx.font = 'bold 12px -apple-system, "Segoe UI", sans-serif';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.textAlign = 'left';
+  ctx.fillText('카테고리별 지출', cardX + 20, cardY + 28);
+
+  // Category bars (top 5) -- thinner with more rounded corners
   const topCategories = categoryBreakdown.slice(0, 5);
-  const barStartY = cardY + 50;
-  const barH = 18;
-  const barGap = 38;
+  const barStartY = cardY + 46;
+  const barH = 12;
+  const barGap = 32;
   const barMaxW = cardW - 40;
 
   topCategories.forEach((item, idx) => {
     const y = barStartY + idx * barGap;
 
     // Label
-    ctx.font = '600 12px -apple-system, "Segoe UI", sans-serif';
+    ctx.font = '600 11px -apple-system, "Segoe UI", sans-serif';
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'left';
     ctx.fillText(item.label, cardX + 20, y);
 
     // Percentage + amount
-    ctx.font = '600 11px -apple-system, "Segoe UI", sans-serif';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.font = '600 10px -apple-system, "Segoe UI", sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
     ctx.textAlign = 'right';
     ctx.fillText(
       `${formatKRW(item.spend)} (${item.percentage.toFixed(0)}%)`,
@@ -154,29 +188,28 @@ function drawCard(
     );
 
     // Bar background
-    const barY = y + 6;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    roundRect(ctx, cardX + 20, barY, barMaxW, barH, 4);
+    const barY = y + 5;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    roundRect(ctx, cardX + 20, barY, barMaxW, barH, 6);
     ctx.fill();
 
     // Bar fill
     const fillW = Math.max((item.percentage / 100) * barMaxW, 8);
     ctx.fillStyle = item.color;
-    roundRect(ctx, cardX + 20, barY, fillW, barH, 4);
+    roundRect(ctx, cardX + 20, barY, fillW, barH, 6);
     ctx.fill();
   });
 
   // Description (below inner card)
-  const descY = cardY + cardH + 30;
+  const descY = cardY + cardH + 26;
   ctx.font = '500 13px -apple-system, "Segoe UI", sans-serif';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
   ctx.textAlign = 'center';
 
   // Simple text wrapping
   const maxLineW = CARD_W - 60;
   const words = dnaProfile.description.split('');
   let line = '';
-  let lineY = descY;
   const lines: string[] = [];
 
   for (const char of words) {
@@ -191,14 +224,14 @@ function drawCard(
   if (line) lines.push(line);
 
   lines.slice(0, 2).forEach((l, i) => {
-    ctx.fillText(l, CARD_W / 2, lineY + i * 20);
+    ctx.fillText(l, CARD_W / 2, descY + i * 20);
   });
 
-  // Watermark
-  ctx.font = '600 12px -apple-system, "Segoe UI", sans-serif';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+  // Watermark -- refined
+  ctx.font = '500 11px -apple-system, "Segoe UI", sans-serif';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
   ctx.textAlign = 'center';
-  ctx.fillText('SubScout에서 분석', CARD_W / 2, CARD_H - 20);
+  ctx.fillText('haedok.app', CARD_W / 2, CARD_H - 18);
 }
 
 export function DNAShareCard({
@@ -232,7 +265,7 @@ export function DNAShareCard({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `subscout-dna-${dnaProfile.type}.png`;
+      a.download = `haedok-dna-${dnaProfile.type}.png`;
       a.click();
       URL.revokeObjectURL(url);
     }, 'image/png');
@@ -260,12 +293,12 @@ export function DNAShareCard({
   }, [handleDownload]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label="공유 카드 미리보기">
       <div className="rounded-2xl bg-card border border-border p-6 shadow-xl max-w-[440px] w-full space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-foreground">공유 카드 미리보기</h3>
-          <Button variant="ghost" size="sm" onClick={onClose} className="rounded-lg">
-            <X className="h-4 w-4" />
+          <Button variant="ghost" size="sm" onClick={onClose} className="rounded-lg" aria-label="닫기">
+            <X className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
 

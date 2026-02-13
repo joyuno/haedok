@@ -2,10 +2,11 @@
 
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { Sidebar, MobileNav } from '@/components/layout';
+import { Sidebar, TopBar, MobileNav } from '@/components/layout';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthProvider } from '@/lib/auth/AuthContext';
 import { SupabaseSyncProvider } from '@/components/SupabaseSyncProvider';
+import { SessionTimeoutDialog } from '@/components/SessionTimeoutDialog';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -37,12 +38,15 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <SupabaseSyncProvider />
+            <SessionTimeoutDialog />
             <div className="min-h-screen">
               {/* Desktop Sidebar */}
               <Sidebar />
 
               {/* Main Content Area */}
               <div className="lg:pl-64">
+                {/* Top Bar with Auth (right-aligned) */}
+                <TopBar />
                 <main className="min-h-screen pb-20 lg:pb-0">{children}</main>
               </div>
 

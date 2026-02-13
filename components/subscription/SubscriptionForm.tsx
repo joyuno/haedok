@@ -204,7 +204,7 @@ export function SubscriptionForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" aria-label={mode === 'add' ? '구독 추가 폼' : '구독 수정 폼'}>
       {mode === 'add' && (
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'preset' | 'custom')}>
           <TabsList className="grid w-full grid-cols-2">
@@ -306,7 +306,7 @@ export function SubscriptionForm({
                   <Button
                     type="button"
                     variant="outline"
-                    className={`justify-between ${isFamilyPlan ? 'border-primary bg-primary/5' : 'border-primary'}`}
+                    className={`justify-between ${isFamilyPlan ? 'border-primary bg-primary/5' : ''}`}
                     onClick={() => handleFamilyPlanSelect(selectedPreset)}
                   >
                     <span className="flex items-center gap-2">
@@ -332,7 +332,7 @@ export function SubscriptionForm({
             <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-3 space-y-1">
               <div className="flex items-center gap-2 text-sm font-medium text-blue-700 dark:text-blue-300">
                 <span>💱</span>
-                <span>달러 환율 적용</span>
+                <span>달러 환율 + 부가세 10% 적용</span>
               </div>
               <p className="text-sm text-blue-600 dark:text-blue-400">
                 {formatExchangeInfo(usdPrice, Math.round(convertUSDtoKRW(usdPrice, exchangeRate)), exchangeRate)}
@@ -345,11 +345,11 @@ export function SubscriptionForm({
 
           {/* Family Plan Sharing Options */}
           {isFamilyPlan && (
-            <div className="rounded-xl border-2 border-primary/20 bg-primary/5 p-4 space-y-4">
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary" />
+            <fieldset className="rounded-xl border-2 border-primary/20 bg-primary/5 p-4 space-y-4">
+              <legend className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" aria-hidden="true" />
                 <Label className="text-base font-semibold">가족 플랜 비용 분담</Label>
-              </div>
+              </legend>
 
               <div className="grid grid-cols-2 gap-3">
                 <Button
@@ -412,7 +412,7 @@ export function SubscriptionForm({
                   </div>
                 </div>
               )}
-            </div>
+            </fieldset>
           )}
 
           <div className="grid grid-cols-2 gap-4">

@@ -103,12 +103,13 @@ export function BenchmarkComparison({ analyses }: BenchmarkComparisonProps) {
                         주 {formatMinutesToHM(analysis.weeklyUsageMinutes)}
                       </span>
                     </div>
-                    <div className="relative h-8 bg-muted rounded-md overflow-hidden">
+                    <div className="relative h-8 bg-muted rounded-md overflow-hidden" role="meter" aria-label="내 사용량" aria-valuenow={Math.round(userPercent)} aria-valuemin={0} aria-valuemax={100}>
                       <div
-                        className="absolute inset-y-0 left-0 flex items-center justify-end px-2 text-xs font-medium text-white rounded-md transition-all"
+                        className="absolute inset-y-0 left-0 flex items-center justify-end px-2 text-xs font-medium rounded-md transition-all"
                         style={{
                           width: `${Math.min(userPercent, 100)}%`,
                           backgroundColor: config.color,
+                          color: '#fff',
                         }}
                       >
                         {Math.round(userPercent)}%
@@ -123,11 +124,12 @@ export function BenchmarkComparison({ analyses }: BenchmarkComparisonProps) {
                         주 {formatMinutesToHM(benchmark!.averageMinutes)}
                       </span>
                     </div>
-                    <div className="relative h-8 bg-muted rounded-md overflow-hidden">
+                    <div className="relative h-8 bg-muted rounded-md overflow-hidden" role="meter" aria-label="한국 평균 사용량" aria-valuenow={100} aria-valuemin={0} aria-valuemax={100}>
                       <div
-                        className="absolute inset-y-0 left-0 flex items-center justify-end px-2 text-xs font-medium text-white bg-gray-400 rounded-md"
+                        className="absolute inset-y-0 left-0 flex items-center justify-end px-2 text-xs font-medium bg-muted-foreground/50 rounded-md"
                         style={{
                           width: `${avgPercent}%`,
+                          color: '#fff',
                         }}
                       >
                         100%

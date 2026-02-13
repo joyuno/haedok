@@ -13,6 +13,7 @@ import {
 } from '@/lib/constants/discountEvents';
 import type { Subscription } from '@/lib/types/subscription';
 import { ExternalLink, Sparkles, Tag, Clock, CreditCard, Smartphone, Gift, PackageOpen } from 'lucide-react';
+import { BrandIcon } from '@/components/subscription/BrandIcon';
 
 interface DiscountEventsProps {
   subscriptions: Subscription[];
@@ -61,7 +62,13 @@ function EventCard({ event, isMatched }: { event: DiscountEvent; isMatched?: boo
     >
       <CardContent className="p-5">
         <div className="flex items-start gap-3">
-          <div className="text-2xl shrink-0 mt-0.5">{event.icon}</div>
+          <BrandIcon
+            name={event.title}
+            icon={event.icon}
+            size="sm"
+            overrideDomain={event.domain}
+            overrideBrandColor={event.brandColor}
+          />
           <div className="flex-1 min-w-0">
             {/* Title row */}
             <div className="flex items-center gap-2 flex-wrap">
@@ -108,7 +115,7 @@ function EventCard({ event, isMatched }: { event: DiscountEvent; isMatched?: boo
             {/* Valid until */}
             {event.validUntil && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground mt-3">
-                <Clock className="w-3 h-3" />
+                <Clock className="w-3 h-3" aria-hidden="true" />
                 <span>{event.validUntil}</span>
               </div>
             )}
@@ -124,8 +131,9 @@ function EventCard({ event, isMatched }: { event: DiscountEvent; isMatched?: boo
                     ? 'bg-green-600 hover:bg-green-700 text-white'
                     : 'bg-primary/[0.08] hover:bg-primary/[0.15] text-primary'
                 }`}
+                aria-label={`${event.title} ${isMatched ? '할인 적용하러 가기' : '혜택 확인하기'} (새 탭에서 열림)`}
               >
-                {isMatched ? '할인 적용하러 가기' : '혜택 확인하기'} <ExternalLink className="w-3.5 h-3.5" />
+                {isMatched ? '할인 적용하러 가기' : '혜택 확인하기'} <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
               </a>
             )}
           </div>
@@ -169,7 +177,7 @@ export function DiscountEvents({ subscriptions }: DiscountEventsProps) {
       {matchedEvents.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-green-600" />
+            <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400" aria-hidden="true" />
             <h3 className="text-lg font-bold">내 구독에 적용 가능한 할인</h3>
             <Badge className="bg-green-500 hover:bg-green-600 text-white text-xs">
               {matchedEvents.length}건

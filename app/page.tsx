@@ -84,7 +84,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-4 lg:p-8 space-y-8">
+    <main className="p-4 lg:p-8 space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -131,20 +131,20 @@ export default function DashboardPage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Category Distribution */}
-        <div className="bg-card rounded-2xl border border-border p-6 lg:p-7">
+        <section className="bg-card rounded-2xl border border-border p-6 lg:p-7" aria-label="카테고리별 지출 비율">
           <h2 className="text-xl font-bold text-foreground mb-5">
             카테고리별 지출 비율
           </h2>
           <CategoryPieChart data={categoryData} />
-        </div>
+        </section>
 
         {/* Upcoming Payments */}
-        <div className="bg-card rounded-2xl border border-border p-6 lg:p-7">
+        <section className="bg-card rounded-2xl border border-border p-6 lg:p-7" aria-label="이번 달 결제 일정">
           <h2 className="text-xl font-bold text-foreground mb-5">
             이번 달 결제 일정
           </h2>
           <PaymentCalendar subscriptions={subscriptions} />
-        </div>
+        </section>
       </div>
 
       {/* Savings Tracker */}
@@ -158,10 +158,10 @@ export default function DashboardPage() {
       )}
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <nav className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="빠른 메뉴">
         <Link
           href="/subscriptions"
-          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200"
+          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <h3 className="font-bold text-foreground mb-1.5">구독 관리</h3>
           <p className="text-sm text-muted-foreground font-medium">
@@ -169,17 +169,8 @@ export default function DashboardPage() {
           </p>
         </Link>
         <Link
-          href="/analysis"
-          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200"
-        >
-          <h3 className="font-bold text-foreground mb-1.5">이용률 분석</h3>
-          <p className="text-sm text-muted-foreground font-medium">
-            사용 패턴을 분석하세요
-          </p>
-        </Link>
-        <Link
           href="/optimize"
-          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200"
+          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <h3 className="font-bold text-foreground mb-1.5">공유 최적화</h3>
           <p className="text-sm text-muted-foreground font-medium">
@@ -188,14 +179,14 @@ export default function DashboardPage() {
         </Link>
         <Link
           href="/guide"
-          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200"
+          className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <h3 className="font-bold text-foreground mb-1.5">입력 가이드</h3>
           <p className="text-sm text-muted-foreground font-medium">
             CSV로 빠르게 추가하세요
           </p>
         </Link>
-      </div>
-    </div>
+      </nav>
+    </main>
   );
 }

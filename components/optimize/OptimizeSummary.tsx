@@ -24,14 +24,14 @@ export function OptimizeSummary({
     <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-primary/10">
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
-          <div className="rounded-full bg-primary/10 p-3">
+          <div className="rounded-full bg-primary/10 p-3" aria-hidden="true">
             <TrendingDown className="h-6 w-6 text-primary" />
           </div>
           <div className="flex-1">
             <h3 className="text-sm font-medium text-muted-foreground mb-1">
               최적화로 절약 가능한 금액
             </h3>
-            <div className="flex items-baseline gap-3 mb-3">
+            <div className="flex items-baseline gap-3 mb-3" aria-live="polite">
               <span className="text-3xl font-bold text-primary">
                 {formatKRW(totalMonthlySavings)}
               </span>

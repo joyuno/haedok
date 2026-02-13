@@ -298,12 +298,14 @@ export function SavingsReport() {
           <div className="flex items-center justify-between mb-1">
             <h4 className="text-sm font-bold text-foreground">투자 시뮬레이션</h4>
             {/* Period selector */}
-            <div className="flex gap-1 bg-accent rounded-lg p-0.5">
+            <div className="flex gap-1 bg-accent rounded-lg p-0.5" role="group" aria-label="투자 기간 선택">
               {PERIOD_OPTIONS.map((opt) => (
                 <button
                   key={opt.key}
                   onClick={() => setChartPeriod(opt.key)}
-                  className={`text-xs font-bold px-3 py-1 rounded-md transition-all duration-200 ${
+                  aria-pressed={chartPeriod === opt.key}
+                  aria-label={`${opt.label} 기간`}
+                  className={`text-xs font-bold px-3 py-1 rounded-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                     chartPeriod === opt.key
                       ? 'bg-card text-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
@@ -405,7 +407,7 @@ export function SavingsReport() {
           </ResponsiveContainer>
 
           {/* Summary cards */}
-          <div className="grid grid-cols-3 gap-3 mt-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
             <div className="rounded-xl bg-[#FFA826]/[0.06] p-3 text-center">
               <div className="text-[10px] font-bold text-[#FFA826] uppercase mb-1">
                 적금 (연 3.5%)

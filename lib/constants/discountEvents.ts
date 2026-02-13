@@ -10,7 +10,11 @@ export interface DiscountEvent {
   conditions?: string;
   validUntil?: string;       // "상시" or date string
   url?: string;
-  icon: string;              // emoji
+  icon: string;              // emoji (fallback)
+  /** 파비콘 조회용 도메인 */
+  domain?: string;
+  /** 브랜드 색상 (fallback 아이콘용) */
+  brandColor?: string;
 }
 
 export const DISCOUNT_EVENTS: DiscountEvent[] = [
@@ -27,6 +31,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://www.samsungcard.com/personal/card/card-detail?id=iD_ON',
     icon: '💳',
+    domain: 'samsungcard.com',
+    brandColor: '#0C4DA2',
   },
   {
     id: 'shinhan-subscription',
@@ -40,6 +46,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://www.shinhancard.com/pconts/html/card/apply/credit/1199524_2207.html',
     icon: '💳',
+    domain: 'shinhancard.com',
+    brandColor: '#0046FF',
   },
   {
     id: 'kb-tok-tok',
@@ -53,6 +61,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://card.kbcard.com/CRD/DICA/DICACC01',
     icon: '💳',
+    domain: 'kbcard.com',
+    brandColor: '#FFBC00',
   },
   {
     id: 'nh-byuldaka',
@@ -66,6 +76,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://card.nonghyup.com/app/card/credit',
     icon: '💳',
+    domain: 'nonghyup.com',
+    brandColor: '#007C3D',
   },
   {
     id: 'lotte-loca365',
@@ -79,6 +91,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://www.lottecard.co.kr/app/LPCDAAF_V100.lc',
     icon: '💳',
+    domain: 'lottecard.co.kr',
+    brandColor: '#ED1C24',
   },
   {
     id: 'samsung-id-sweet',
@@ -92,6 +106,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://www.samsungcard.com/personal/card/card-detail?id=iD_SWEET',
     icon: '💳',
+    domain: 'samsungcard.com',
+    brandColor: '#0C4DA2',
   },
   // Telecom promotions
   {
@@ -105,6 +121,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://www.lguplus.com/pogg/product/double-streaming',
     icon: '📶',
+    domain: 'lguplus.com',
+    brandColor: '#E6007E',
   },
   {
     id: 'lgu-yudok-pick2',
@@ -118,6 +136,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://www.lguplus.com/pogg/main',
     icon: '📶',
+    domain: 'lguplus.com',
+    brandColor: '#E6007E',
   },
   {
     id: 'lgu-disney-5pct',
@@ -131,6 +151,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://www.lguplus.com/pogg/product/디즈니플러스-월정액-구독',
     icon: '📶',
+    domain: 'lguplus.com',
+    brandColor: '#E6007E',
   },
   {
     id: 'skt-tving-webtoon',
@@ -143,6 +165,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://www.tworld.co.kr',
     icon: '📱',
+    domain: 'tworld.co.kr',
+    brandColor: '#E4002B',
   },
   {
     id: 'kt-unlimited-tving',
@@ -155,6 +179,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://product.kt.com/benefit/membership/web/benefit_pkg.html',
     icon: '📡',
+    domain: 'kt.com',
+    brandColor: '#ED1C24',
   },
   // Promotions
   {
@@ -168,6 +194,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://nid.naver.com/membership/my',
     icon: '💚',
+    domain: 'naver.com',
+    brandColor: '#03C75A',
   },
   {
     id: 'disney-annual-40off',
@@ -181,6 +209,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://www.disneyplus.com/ko-kr',
     icon: '🏰',
+    domain: 'disneyplus.com',
+    brandColor: '#113CCF',
   },
   // Bundle deals
   {
@@ -194,6 +224,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '상시',
     url: 'https://www.tving.com/event',
     icon: '📦',
+    domain: 'tving.com',
+    brandColor: '#FF0558',
   },
   {
     id: 'cgv-tving-coupon',
@@ -206,6 +238,8 @@ export const DISCOUNT_EVENTS: DiscountEvent[] = [
     validUntil: '이벤트별 상이',
     url: 'https://www.cgv.co.kr/culture-event/event/',
     icon: '🎬',
+    domain: 'cgv.co.kr',
+    brandColor: '#E51837',
   },
 ];
 

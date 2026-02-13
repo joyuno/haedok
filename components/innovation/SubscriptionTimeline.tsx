@@ -184,11 +184,11 @@ export function SubscriptionTimeline() {
     return (
       <div className="space-y-6">
         <div>
-          <h3 className="text-2xl font-extrabold text-foreground mb-1">구독 타임라인</h3>
+          <h3 className="text-2xl font-extrabold text-foreground mb-1.5">구독 타임라인</h3>
           <p className="text-sm text-muted-foreground font-medium">구독 변화 이력을 시간순으로 확인하세요</p>
         </div>
-        <div className="rounded-2xl border-2 border-dashed border-border p-8 text-center">
-          <p className="text-sm text-muted-foreground font-medium">
+        <div className="rounded-3xl border-2 border-dashed border-border/60 p-10 text-center">
+          <p className="text-sm text-muted-foreground font-medium leading-relaxed">
             아직 구독 이벤트가 없어요.<br />
             구독을 추가하면 타임라인이 생성됩니다.
           </p>
@@ -198,35 +198,47 @@ export function SubscriptionTimeline() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="text-2xl font-extrabold text-foreground mb-1">구독 타임라인</h3>
+        <h3 className="text-2xl font-extrabold text-foreground mb-1.5">구독 타임라인</h3>
         <p className="text-sm text-muted-foreground font-medium">구독 변화 이력을 시간순으로 확인하세요</p>
       </div>
 
       {/* Timeline */}
       <div className="relative">
         {monthGroups.map((group, groupIdx) => (
-          <div key={group.key} className="mb-8 last:mb-0">
+          <div key={group.key} className="mb-10 last:mb-0">
             {/* Month header with subtotal + cumulative */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-primary shrink-0" />
+            <div className="flex items-center gap-3 mb-5">
+              <div className="flex items-center gap-2.5">
+                {/* Pulsing month indicator */}
+                <div className="relative w-3.5 h-3.5 shrink-0">
+                  <div className="absolute inset-0 rounded-full bg-primary opacity-20 animate-ping" />
+                  <div className="relative w-3.5 h-3.5 rounded-full bg-primary shadow-[0_0_8px_rgba(49,130,246,0.3)]" />
+                </div>
                 <h4 className="text-sm font-extrabold text-foreground">{group.label}</h4>
               </div>
-              <div className="flex-1 h-px bg-border" />
+              <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs font-bold text-primary bg-primary/[0.06] px-3 py-1 rounded-full whitespace-nowrap">
+                <span className="text-[11px] font-bold text-primary bg-primary/[0.07] px-3 py-1.5 rounded-xl whitespace-nowrap border border-primary/10">
                   월 {formatKRW(group.monthlyTotal)}
                 </span>
-                <span className="text-[10px] font-bold text-muted-foreground bg-accent px-2 py-1 rounded-full whitespace-nowrap">
+                <span className="text-[10px] font-bold text-muted-foreground bg-muted/60 px-2.5 py-1.5 rounded-xl whitespace-nowrap border border-border/40">
                   누적 {formatKRW((group as MonthGroup & { cumulativeSpent: number }).cumulativeSpent || 0)}
                 </span>
               </div>
             </div>
 
             {/* Events with vertical line */}
-            <div className="relative ml-1.5 pl-6 border-l-2 border-border space-y-3">
+            <div className="relative ml-[7px] pl-7 space-y-3">
+              {/* Gradient timeline line */}
+              <div
+                className="absolute left-0 top-0 bottom-0 w-[2px] rounded-full"
+                style={{
+                  background: 'linear-gradient(to bottom, var(--color-border, hsl(var(--border))), transparent)',
+                }}
+              />
+
               {group.events.map((event) => {
                 const meta = EVENT_META[event.type];
                 const sub = event.subscription;
@@ -236,22 +248,35 @@ export function SubscriptionTimeline() {
                 return (
                   <div
                     key={event.id}
-                    className="relative rounded-2xl border border-border bg-card p-4 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:border-border/80 transition-all duration-300"
+                    className="group relative rounded-2xl border border-border/50 bg-card p-4 hover:shadow-[0_4px_24px_rgba(0,0,0,0.08)] hover:border-border transition-all duration-300"
                   >
-                    {/* Node on the line */}
+                    {/* Node on the line -- with glow */}
+                    <div className="absolute -left-[calc(1.75rem+5px)] top-5">
+                      <div
+                        className="w-3 h-3 rounded-full border-[2.5px] shadow-sm"
+                        style={{
+                          backgroundColor: meta.color,
+                          borderColor: meta.color,
+                          boxShadow: `0 0 8px ${meta.color}30`,
+                        }}
+                      />
+                    </div>
+
+                    {/* Subtle hover glow */}
                     <div
-                      className="absolute -left-[calc(1.5rem+5px)] top-5 w-3 h-3 rounded-full border-2 shrink-0"
-                      style={{
-                        backgroundColor: meta.color,
-                        borderColor: meta.color,
-                      }}
+                      className="absolute -top-8 -right-8 w-24 h-24 rounded-full blur-3xl opacity-0 group-hover:opacity-[0.06] transition-opacity duration-500 pointer-events-none"
+                      style={{ backgroundColor: meta.color }}
                     />
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 relative">
                       {/* Event type badge */}
                       <div
-                        className="w-8 h-8 rounded-xl flex items-center justify-center text-sm font-extrabold shrink-0"
-                        style={{ color: meta.color, backgroundColor: meta.bg }}
+                        className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-extrabold shrink-0 border"
+                        style={{
+                          color: meta.color,
+                          backgroundColor: meta.bg,
+                          borderColor: `${meta.color}15`,
+                        }}
                       >
                         {meta.symbol}
                       </div>
@@ -264,7 +289,7 @@ export function SubscriptionTimeline() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-bold text-foreground truncate">{sub.name}</span>
                           <span
-                            className="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0"
+                            className="text-[10px] font-bold px-2 py-0.5 rounded-lg shrink-0"
                             style={{ color: meta.color, backgroundColor: meta.bg }}
                           >
                             {meta.label}
@@ -274,7 +299,8 @@ export function SubscriptionTimeline() {
                           <span className="text-xs text-muted-foreground font-medium">
                             {CATEGORY_LABELS[sub.category as SubscriptionCategory]}
                           </span>
-                          <span className="text-[10px] text-muted-foreground">{dateStr}</span>
+                          <span className="w-0.5 h-0.5 rounded-full bg-muted-foreground/30" />
+                          <span className="text-[11px] text-muted-foreground/70 font-medium">{dateStr}</span>
                         </div>
                       </div>
 
@@ -288,7 +314,7 @@ export function SubscriptionTimeline() {
                           {event.type === 'cancelled' && `-${formatKRW(sub.monthlyPrice)}`}
                           {event.type === 'changed' && `${formatKRW(sub.monthlyPrice)}`}
                         </div>
-                        <div className="text-[10px] text-muted-foreground font-medium">/월</div>
+                        <div className="text-[10px] text-muted-foreground/60 font-medium">/월</div>
                       </div>
                     </div>
                   </div>
@@ -299,31 +325,38 @@ export function SubscriptionTimeline() {
         ))}
       </div>
 
-      {/* Summary */}
-      <div className="rounded-2xl bg-card border border-border p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-        <h4 className="text-xs font-bold text-muted-foreground tracking-wide uppercase mb-4">타임라인 요약</h4>
-        <div className="grid gap-4 sm:grid-cols-4">
-          <div>
-            <div className="text-xs text-muted-foreground font-semibold mb-1">총 이벤트</div>
-            <div className="text-3xl font-extrabold text-foreground tracking-tight">
-              {allEvents.length}건
+      {/* Summary -- Premium glass card */}
+      <section className="relative overflow-hidden rounded-3xl bg-card border border-border/60 p-7 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,0,0,0.06)]" aria-label="타임라인 요약">
+        {/* Ambient glows */}
+        <div className="absolute -top-16 -left-16 w-40 h-40 rounded-full blur-[80px] opacity-[0.05] pointer-events-none" style={{ backgroundColor: '#1FC08E' }} aria-hidden="true" />
+        <div className="absolute -bottom-12 -right-12 w-36 h-36 rounded-full blur-[60px] opacity-[0.04] pointer-events-none" style={{ backgroundColor: '#3182F6' }} aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.012] pointer-events-none bg-[radial-gradient(circle_at_60%_40%,var(--color-foreground)_1px,transparent_1px)] bg-[length:20px_20px]" aria-hidden="true" />
+
+        <h4 className="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-6 relative">
+          타임라인 요약
+        </h4>
+        <div className="grid gap-5 sm:grid-cols-4 relative">
+          <div className="space-y-1.5">
+            <div className="text-[11px] text-muted-foreground font-semibold tracking-wide">총 이벤트</div>
+            <div className="text-[2rem] font-extrabold text-foreground tracking-tight leading-none">
+              {allEvents.length}<span className="text-base font-bold text-muted-foreground ml-0.5">건</span>
             </div>
           </div>
-          <div>
-            <div className="text-xs text-muted-foreground font-semibold mb-1">추가</div>
-            <div className="text-3xl font-extrabold tracking-tight" style={{ color: '#1FC08E' }}>
-              {allEvents.filter((e) => e.type === 'added').length}건
+          <div className="space-y-1.5">
+            <div className="text-[11px] text-muted-foreground font-semibold tracking-wide">추가</div>
+            <div className="text-[2rem] font-extrabold tracking-tight leading-none" style={{ color: '#1FC08E' }}>
+              {allEvents.filter((e) => e.type === 'added').length}<span className="text-base font-bold opacity-60 ml-0.5">건</span>
             </div>
           </div>
-          <div>
-            <div className="text-xs text-muted-foreground font-semibold mb-1">해지</div>
-            <div className="text-3xl font-extrabold tracking-tight" style={{ color: '#F04452' }}>
-              {allEvents.filter((e) => e.type === 'cancelled').length}건
+          <div className="space-y-1.5">
+            <div className="text-[11px] text-muted-foreground font-semibold tracking-wide">해지</div>
+            <div className="text-[2rem] font-extrabold tracking-tight leading-none" style={{ color: '#F04452' }}>
+              {allEvents.filter((e) => e.type === 'cancelled').length}<span className="text-base font-bold opacity-60 ml-0.5">건</span>
             </div>
           </div>
-          <div>
-            <div className="text-xs text-muted-foreground font-semibold mb-1">누적 지출</div>
-            <div className="text-3xl font-extrabold tracking-tight" style={{ color: '#3182F6' }}>
+          <div className="space-y-1.5">
+            <div className="text-[11px] text-muted-foreground font-semibold tracking-wide">누적 지출</div>
+            <div className="text-[2rem] font-extrabold tracking-tight leading-none" style={{ color: '#3182F6' }}>
               {formatKRW(
                 monthGroups.length > 0
                   ? (monthGroups[0] as MonthGroup & { cumulativeSpent: number }).cumulativeSpent || 0
@@ -332,7 +365,7 @@ export function SubscriptionTimeline() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

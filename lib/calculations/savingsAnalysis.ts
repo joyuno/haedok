@@ -211,14 +211,11 @@ function analyzeDiscountSavings(subscriptions: Subscription[]): SavingsItem[] {
     (e) => e.type === 'card' || e.type === 'telecom' || e.type === 'promotion',
   );
 
-  // 이미 추가된 구독 ID 추적 (중복 방지)
-  const processedSubIds = new Set<string>();
+  // 구독당 최고 할인 1개만 유지 (카드/통신사/프로모션 중 최대 절약)
+  const bestBySubId = new Map<string, SavingsItem>();
 
   for (const event of discountEvents) {
-    // 이 이벤트에 매칭되는 구독 찾기
     for (const sub of active) {
-      if (processedSubIds.has(`${sub.id}-${event.type}`)) continue;
-
       const matches = event.targetServices.some(
         (target) => sub.name.includes(target) || target.includes(sub.name),
       );
@@ -230,7 +227,6 @@ function analyzeDiscountSavings(subscriptions: Subscription[]): SavingsItem[] {
       if (event.discountAmount) {
         savingsPerMonth = event.discountAmount;
       } else if (event.discountPercent) {
-        // 퍼센트 할인: 정밀 계산
         savingsPerMonth = Math.round((sub.monthlyPrice * event.discountPercent) / 100 * 100) / 100;
       }
 
@@ -238,26 +234,27 @@ function analyzeDiscountSavings(subscriptions: Subscription[]): SavingsItem[] {
       savingsPerMonth = Math.min(savingsPerMonth, sub.monthlyPrice);
 
       if (savingsPerMonth > 0) {
-        processedSubIds.add(`${sub.id}-${event.type}`);
+        const existing = bestBySubId.get(sub.id);
+        if (!existing || savingsPerMonth > existing.savingsPerMonth) {
+          const typeLabel =
+            event.type === 'card' ? '카드 할인' :
+            event.type === 'telecom' ? '통신사 혜택' : '프로모션';
 
-        const typeLabel =
-          event.type === 'card' ? '카드 할인' :
-          event.type === 'telecom' ? '통신사 혜택' : '프로모션';
-
-        items.push({
-          subscriptionName: sub.name,
-          subscriptionIcon: sub.icon,
-          currentMonthlyPrice: sub.monthlyPrice,
-          action: 'use_discount',
-          savingsPerMonth,
-          description: `${event.title}: ${event.description}`,
-          source: `${typeLabel} (${event.provider})`,
-        });
+          bestBySubId.set(sub.id, {
+            subscriptionName: sub.name,
+            subscriptionIcon: sub.icon,
+            currentMonthlyPrice: sub.monthlyPrice,
+            action: 'use_discount',
+            savingsPerMonth,
+            description: `${event.title}: ${event.description}`,
+            source: `${typeLabel} (${event.provider})`,
+          });
+        }
       }
     }
   }
 
-  return items;
+  return Array.from(bestBySubId.values());
 }
 
 /**
@@ -370,28 +367,81 @@ function analyzeDowngradeSavings(
 // ── Deduplication ──────────────────────────────────────────────────────
 
 /**
- * 동일 구독에 대해 가장 효과적인 절약 방법만 남깁니다.
- * 번들 항목은 별도로 유지 (여러 구독 합산이므로).
+ * 하나의 구독 = 하나의 최적 절약 방법만 남깁니다.
+ * 번들이 같은 구독을 클레임하면 절약이 큰 번들 우선.
+ * 번들에 포함된 구독은 개별 항목에서 제거.
+ * 총 절약 ≤ 총 구독비 보장.
  */
-function deduplicateSavingsItems(items: SavingsItem[]): SavingsItem[] {
-  // 번들 항목은 별도 보존
+function deduplicateSavingsItems(
+  items: SavingsItem[],
+  activeSubscriptions: Subscription[],
+): SavingsItem[] {
   const bundleItems = items.filter((item) => item.action === 'use_bundle');
   const nonBundleItems = items.filter((item) => item.action !== 'use_bundle');
 
-  // 비번들 항목: 동일 구독명 기준으로 가장 큰 절약액 우선
+  // 번들에 클레임된 구독 이름 추적
+  const claimedByBundle = new Set<string>();
+
+  // 번들 간 중복 해소: 같은 구독을 포함하는 번들이 여러 개면 절약이 큰 것 우선
+  const sortedBundles = [...bundleItems].sort(
+    (a, b) => b.savingsPerMonth - a.savingsPerMonth,
+  );
+  const selectedBundles: SavingsItem[] = [];
+
+  for (const bundle of sortedBundles) {
+    // 번들에 포함된 개별 구독 이름 추출 (" + " split)
+    const bundleSubNames = bundle.subscriptionName
+      .split(' + ')
+      .map((n) => n.trim());
+
+    // 이미 다른 번들에 클레임된 구독이 있는지 확인
+    const hasConflict = bundleSubNames.some((name) => claimedByBundle.has(name));
+    if (hasConflict) continue;
+
+    // 이 번들 선택
+    selectedBundles.push(bundle);
+    for (const name of bundleSubNames) {
+      claimedByBundle.add(name);
+    }
+  }
+
+  // 비번들 항목: 동일 구독명 → 최고 절약 1개, 번들에 포함된 구독 제외
   const bestByName = new Map<string, SavingsItem>();
 
   for (const item of nonBundleItems) {
+    if (claimedByBundle.has(item.subscriptionName)) continue;
+
     const existing = bestByName.get(item.subscriptionName);
     if (!existing || item.savingsPerMonth > existing.savingsPerMonth) {
       bestByName.set(item.subscriptionName, item);
     }
   }
 
-  const deduped = [...bundleItems, ...Array.from(bestByName.values())];
+  // 각 항목의 절약액이 해당 구독의 monthlyPrice를 초과하지 않도록 보장
+  const allSelected = [...selectedBundles, ...Array.from(bestByName.values())];
+  for (const item of allSelected) {
+    item.savingsPerMonth = Math.min(item.savingsPerMonth, item.currentMonthlyPrice);
+  }
 
-  // 절약액 내림차순 정렬
-  return deduped.sort((a, b) => b.savingsPerMonth - a.savingsPerMonth);
+  // 글로벌 캡: 총 절약 ≤ 총 월 구독비
+  const totalMonthlySpend = activeSubscriptions.reduce(
+    (sum, s) => sum + s.monthlyPrice,
+    0,
+  );
+  const totalSavings = allSelected.reduce(
+    (sum, item) => sum + item.savingsPerMonth,
+    0,
+  );
+
+  if (totalSavings > totalMonthlySpend && totalSavings > 0) {
+    // 비례 축소
+    const ratio = totalMonthlySpend / totalSavings;
+    for (const item of allSelected) {
+      item.savingsPerMonth = Math.round(item.savingsPerMonth * ratio);
+    }
+  }
+
+  return allSelected.sort((a, b) => b.savingsPerMonth - a.savingsPerMonth);
 }
 
 // ── Purchase Alternatives ──────────────────────────────────────────────
@@ -539,7 +589,7 @@ export function generateSavingsReport(
     ...cancelItems,
     ...downgradeItems,
   ];
-  const dedupedItems = deduplicateSavingsItems(allItems);
+  const dedupedItems = deduplicateSavingsItems(allItems, active);
 
   // 3. 총 절약액 계산 (정밀 합산)
   const monthlySavings = dedupedItems.reduce(

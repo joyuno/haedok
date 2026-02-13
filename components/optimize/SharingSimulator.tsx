@@ -74,7 +74,7 @@ export function SharingSimulator({ opportunity }: SharingSimulatorProps) {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Users className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
               <span className="text-sm font-medium">공유 인원</span>
             </div>
             <span className="text-lg font-bold">
@@ -88,6 +88,7 @@ export function SharingSimulator({ opportunity }: SharingSimulatorProps) {
             max={opportunity.maxMembers}
             step={1}
             className="w-full"
+            aria-label={`${opportunity.subscription.name} 공유 인원 선택`}
           />
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>2명</span>
@@ -98,7 +99,7 @@ export function SharingSimulator({ opportunity }: SharingSimulatorProps) {
         {/* Savings Highlight */}
         <div className="rounded-lg bg-primary/10 p-4">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingDown className="h-5 w-5 text-primary" />
+            <TrendingDown className="h-5 w-5 text-primary" aria-hidden="true" />
             <span className="font-semibold text-primary">
               월 {formatKRW(currentSavings)} 절약
             </span>

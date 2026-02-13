@@ -58,7 +58,7 @@ export function SubscriptionCard({
     active: 'bg-green-500',
     trial: 'bg-blue-500',
     paused: 'bg-yellow-500',
-    cancelled: 'bg-gray-500',
+    cancelled: 'bg-muted-foreground',
   };
 
   const monthlyDisplay =
@@ -78,9 +78,11 @@ export function SubscriptionCard({
                   <h3 className="font-bold text-xl truncate text-foreground">
                     {subscription.name}
                   </h3>
-                  <div
-                    className={`h-2 w-2 rounded-full ${statusColors[subscription.status]}`}
+                  <span
+                    className={`h-2 w-2 rounded-full inline-block ${statusColors[subscription.status]}`}
                     title={statusLabels[subscription.status]}
+                    role="status"
+                    aria-label={`상태: ${statusLabels[subscription.status]}`}
                   />
                 </div>
                 {subscription.planName && (
@@ -114,8 +116,9 @@ export function SubscriptionCard({
                     variant="outline"
                     size="sm"
                     className="h-8 w-8 p-0 rounded-lg border-border hover:bg-accent hover:border-primary/30 transition-all"
+                    aria-label={`${subscription.name} 옵션 메뉴`}
                   >
-                    <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                    <MoreVertical className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="rounded-xl">

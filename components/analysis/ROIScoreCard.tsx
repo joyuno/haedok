@@ -1,12 +1,10 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import type { ROIAnalysis } from '@/lib/types/usage';
 import { ROI_GRADE_CONFIG } from '@/lib/types/usage';
 import { formatKRW } from '@/lib/utils/formatCurrency';
-import { formatMinutesToHM } from '@/lib/utils/formatDuration';
 import { TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { BrandIcon } from '@/components/subscription/BrandIcon';
 
@@ -24,11 +22,11 @@ export function ROIScoreCard({ analysis }: ROIScoreCardProps) {
   const getRecommendIcon = () => {
     switch (analysis.recommendation) {
       case 'keep':
-        return <TrendingUp className="h-4 w-4 text-green-600" />;
+        return <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />;
       case 'cancel':
-        return <TrendingDown className="h-4 w-4 text-red-600" />;
+        return <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />;
       default:
-        return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+        return <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />;
     }
   };
 
@@ -45,11 +43,14 @@ export function ROIScoreCard({ analysis }: ROIScoreCardProps) {
               </p>
             </div>
           </div>
-          <Badge
-            className={`text-lg font-bold ${gradeConfig.badgeClass}`}
+          <div
+            className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg font-black shrink-0 shadow-sm ${gradeConfig.badgeClass}`}
+            style={{ color: gradeConfig.color, border: `2px solid ${gradeConfig.color}20` }}
+            role="img"
+            aria-label={`가성비 등급: ${analysis.grade} (${gradeConfig.label})`}
           >
-            {gradeConfig.emoji} {analysis.grade}
-          </Badge>
+            {analysis.grade}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -65,15 +66,19 @@ export function ROIScoreCard({ analysis }: ROIScoreCardProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs text-muted-foreground mb-1">주간 사용시간</p>
+            <p className="text-xs text-muted-foreground mb-1">
+              {analysis.metricType === 'time' ? '주간 사용시간' : analysis.metricType === 'count' ? '월간 이용횟수' : '주 사용일수'}
+            </p>
             <p className="text-lg font-semibold">
-              {formatMinutesToHM(analysis.weeklyUsageMinutes)}
+              {analysis.usageLabel}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground mb-1">시간당 비용</p>
+            <p className="text-xs text-muted-foreground mb-1">
+              {analysis.metricType === 'time' ? '시간당 비용' : analysis.metricType === 'count' ? '회당 비용' : '일당 비용'}
+            </p>
             <p className="text-lg font-semibold">
-              {analysis.costPerMinute > 0 ? formatKRW(analysis.costPerMinute * 60, 1) : '-'}
+              {analysis.costEfficiencyLabel}
             </p>
           </div>
         </div>

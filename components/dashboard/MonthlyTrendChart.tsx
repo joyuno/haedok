@@ -33,7 +33,7 @@ export function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
   }
 
   return (
-    <div className="w-full h-80">
+    <figure className="w-full h-80" role="img" aria-label="월별 구독 비용 추이 차트">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data}>
           <defs>
@@ -94,6 +94,6 @@ export function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
           />
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </figure>
   );
 }

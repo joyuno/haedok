@@ -14,10 +14,20 @@ export function PaymentCalendar({ subscriptions }: PaymentCalendarProps) {
   const today = new Date();
   const currentDay = today.getDate();
 
-  // Sort by billing day
-  const upcomingPayments = subscriptions
-    .filter((sub) => sub.status === 'active' || sub.status === 'trial')
+  // Split into upcoming (future/today) and past, each sorted by billingDay
+  const activePayments = subscriptions
+    .filter((sub) => sub.status === 'active' || sub.status === 'trial');
+
+  const upcoming = activePayments
+    .filter((sub) => sub.billingDay >= currentDay)
     .sort((a, b) => a.billingDay - b.billingDay);
+
+  const past = activePayments
+    .filter((sub) => sub.billingDay < currentDay)
+    .sort((a, b) => a.billingDay - b.billingDay);
+
+  // Upcoming first, then past
+  const upcomingPayments = [...upcoming, ...past];
 
   if (upcomingPayments.length === 0) {
     return (
@@ -36,9 +46,9 @@ export function PaymentCalendar({ subscriptions }: PaymentCalendarProps) {
     const isPast = sub.billingDay < currentDay;
 
     return (
-      <div
+      <li
         key={sub.id}
-        className={`flex items-center gap-3.5 p-3.5 rounded-2xl transition-all duration-200 ${
+        className={`flex items-center gap-3.5 p-3.5 rounded-2xl transition-all duration-200 list-none ${
           isToday
             ? 'bg-primary/[0.06] ring-1 ring-primary/20'
             : isPast
@@ -98,24 +108,48 @@ export function PaymentCalendar({ subscriptions }: PaymentCalendarProps) {
         }`}>
           {formatKRW(sub.monthlyPrice)}
         </p>
-      </div>
+      </li>
     );
   };
 
-  const displayItems = upcomingPayments.slice(0, 6);
+  const maxDisplay = 6;
+  const upcomingDisplay = upcoming.slice(0, maxDisplay);
+  const remainingSlots = maxDisplay - upcomingDisplay.length;
+  const pastDisplay = past.slice(0, Math.max(remainingSlots, 0));
+  const totalShown = upcomingDisplay.length + pastDisplay.length;
+  const totalAll = activePayments.length;
 
   return (
-    <div className="space-y-1">
-      {/* Upcoming section */}
-      {displayItems.map(renderItem)}
+    <div className="space-y-1" role="list" aria-label="이번 달 결제 일정">
+      {/* Upcoming payments */}
+      {upcomingDisplay.length > 0 && (
+        <>
+          <p className="text-[11px] font-bold text-primary px-1 pb-1">
+            결제 예정 ({upcoming.length})
+          </p>
+          <ul className="space-y-1">
+            {upcomingDisplay.map(renderItem)}
+          </ul>
+        </>
+      )}
+
+      {/* Past payments */}
+      {pastDisplay.length > 0 && (
+        <>
+          <p className="text-[11px] font-bold text-muted-foreground px-1 pt-3 pb-1">
+            결제 완료 ({past.length})
+          </p>
+          <ul className="space-y-1">
+            {pastDisplay.map(renderItem)}
+          </ul>
+        </>
+      )}
 
       {/* Overflow indicator */}
-      {upcomingPayments.length > 6 && (
-        <div className="pt-2 pb-1">
-          <p className="text-center text-xs text-muted-foreground font-semibold bg-accent/50 rounded-xl py-2">
-            외 {upcomingPayments.length - 6}개 구독
-          </p>
-        </div>
+      {totalAll > totalShown && (
+        <p className="text-center text-xs text-muted-foreground font-semibold bg-accent/50 rounded-xl py-2 mt-2">
+          외 {totalAll - totalShown}개 구독
+        </p>
       )}
     </div>
   );

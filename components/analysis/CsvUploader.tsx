@@ -125,7 +125,7 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'subscout_usage_template.csv';
+    a.download = 'haedok_usage_template.csv';
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -142,7 +142,7 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
         {!file && (
           <>
             <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                 isDragging
                   ? 'border-primary bg-primary/5'
                   : 'border-muted-foreground/25 hover:border-primary'
@@ -151,8 +151,12 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click(); } }}
+              role="button"
+              tabIndex={0}
+              aria-label="CSV 파일을 드래그하거나 클릭하여 선택"
             >
-              <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+              <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" aria-hidden="true" />
               <p className="text-lg font-medium mb-2">
                 CSV 파일을 드래그하거나 클릭하여 선택하세요
               </p>
@@ -174,6 +178,7 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
               accept=".csv"
               onChange={handleFileSelect}
               className="hidden"
+              aria-label="CSV 파일 선택"
             />
           </>
         )}
@@ -202,12 +207,12 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
             </div>
 
             {errors.length > 0 && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="p-3 bg-red-50 border border-red-200 dark:bg-red-950/30 dark:border-red-800 rounded-lg">
                 <div className="flex items-start gap-2">
-                  <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
                   <div className="flex-1">
-                    <p className="font-medium text-red-900 mb-1">오류 발생</p>
-                    <ul className="text-sm text-red-800 space-y-1">
+                    <p className="font-medium text-red-900 dark:text-red-300 mb-1">오류 발생</p>
+                    <ul className="text-sm text-red-800 dark:text-red-400 space-y-1">
                       {errors.map((error, i) => (
                         <li key={i}>• {error}</li>
                       ))}
@@ -259,14 +264,14 @@ export function CsvUploader({ onComplete }: CsvUploaderProps) {
             )}
 
             {importResult !== null && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="p-3 bg-green-50 border border-green-200 dark:bg-green-950/30 dark:border-green-800 rounded-lg">
                 <div className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
                   <div>
-                    <p className="font-medium text-green-900">
+                    <p className="font-medium text-green-900 dark:text-green-300">
                       가져오기 완료!
                     </p>
-                    <p className="text-sm text-green-800">
+                    <p className="text-sm text-green-800 dark:text-green-400">
                       {importResult}개 데이터를 성공적으로 가져왔습니다.
                     </p>
                   </div>

@@ -100,7 +100,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
   return (
     <div className="w-full">
       {/* Donut chart */}
-      <div className="w-full h-72">
+      <figure className="w-full h-72" role="img" aria-label={`카테고리별 구독 비용 분포 차트. ${chartData.map(e => `${e.name} ${((e.value / total) * 100).toFixed(0)}%`).join(', ')}`}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -144,21 +144,24 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
             />
           </PieChart>
         </ResponsiveContainer>
-      </div>
+      </figure>
 
       {/* Custom Legend -- Toss-style horizontal pill layout */}
-      <div className="flex flex-wrap gap-2 justify-center mt-4">
+      <div className="flex flex-wrap gap-2 justify-center mt-4" role="list" aria-label="카테고리 범례">
         {chartData.map((entry, index) => {
           const percent = total > 0 ? ((entry.value / total) * 100).toFixed(0) : '0';
           return (
             <button
               key={entry.category}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                 index === activeIndex
                   ? 'bg-primary/10 border-primary/30 text-foreground shadow-sm scale-105'
                   : 'bg-card border-border text-muted-foreground hover:bg-accent hover:text-foreground'
               }`}
               onMouseEnter={() => setActiveIndex(index)}
+              onFocus={() => setActiveIndex(index)}
+              aria-label={`${entry.name} ${percent}% ${formatKRW(entry.value)}`}
+              role="listitem"
             >
               <span
                 className="w-2.5 h-2.5 rounded-full shrink-0"

@@ -51,7 +51,7 @@ export default function OptimizePage() {
       <div className="container max-w-6xl mx-auto p-6">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-3 flex items-center gap-3">
-            <TrendingDown className="h-9 w-9" />
+            <TrendingDown className="h-9 w-9" aria-hidden="true" />
             구독 최적화
           </h1>
           <p className="text-muted-foreground text-lg">
@@ -72,7 +72,7 @@ export default function OptimizePage() {
       <div className="container max-w-6xl mx-auto p-6">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-3 flex items-center gap-3">
-            <TrendingDown className="h-9 w-9" />
+            <TrendingDown className="h-9 w-9" aria-hidden="true" />
             구독 최적화
           </h1>
           <p className="text-muted-foreground text-lg">
@@ -102,11 +102,11 @@ export default function OptimizePage() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto p-6 space-y-8">
+    <main className="container max-w-6xl mx-auto p-6 space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-4xl font-bold mb-3 flex items-center gap-3">
-          <TrendingDown className="h-9 w-9" />
+          <TrendingDown className="h-9 w-9" aria-hidden="true" />
           구독 최적화
         </h1>
         <p className="text-muted-foreground text-lg">
@@ -245,6 +245,6 @@ export default function OptimizePage() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </main>
   );
 }

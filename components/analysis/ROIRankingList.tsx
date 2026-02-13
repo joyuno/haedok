@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import type { ROIAnalysis } from '@/lib/types/usage';
 import { ROI_GRADE_CONFIG } from '@/lib/types/usage';
 import { formatKRW } from '@/lib/utils/formatCurrency';
@@ -41,7 +40,7 @@ export function ROIRankingList({ analyses }: ROIRankingListProps) {
           {totalSavings > 0 && (
             <div className="text-right">
               <p className="text-xs text-muted-foreground">절약 가능 금액</p>
-              <p className="text-2xl font-bold text-red-600">
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                 {formatKRW(totalSavings)}/월
               </p>
             </div>
@@ -75,24 +74,29 @@ export function ROIRankingList({ analyses }: ROIRankingListProps) {
                       {formatKRW(analysis.monthlyPrice)}/월
                     </p>
                   </div>
-                  <Badge
-                    className={`font-bold ${gradeConfig.badgeClass}`}
+                  <div
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-black shrink-0 shadow-sm ${gradeConfig.badgeClass}`}
+                    style={{ color: gradeConfig.color, border: `2px solid ${gradeConfig.color}20` }}
+                    role="img"
+                    aria-label={`등급 ${analysis.grade}`}
                   >
-                    {gradeConfig.emoji} {analysis.grade}
-                  </Badge>
+                    {analysis.grade}
+                  </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">시간당 비용</span>
+                    <span className="text-muted-foreground">
+                      {analysis.metricType === 'time' ? '시간당 비용' : analysis.metricType === 'count' ? '회당 비용' : '일당 비용'}
+                    </span>
                     <span className="font-medium">
                       {analysis.costPerMinute > 0
-                        ? formatKRW(analysis.costPerMinute * 60, 1)
+                        ? analysis.costEfficiencyLabel
                         : '미사용'}
                     </span>
                   </div>
 
-                  <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="relative h-2 bg-muted rounded-full overflow-hidden" role="meter" aria-label={analysis.metricType === 'time' ? '시간당 비용' : analysis.metricType === 'count' ? '회당 비용' : '일당 비용'} aria-valuenow={Math.round(barWidth)} aria-valuemin={0} aria-valuemax={100}>
                     <div
                       className="absolute inset-y-0 left-0 rounded-full transition-all"
                       style={{

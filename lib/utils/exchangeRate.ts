@@ -1,7 +1,7 @@
 // USD/KRW 당일 환율 조회 (무료 API, 클라이언트사이드)
 // 하루 1회 조회, 24시간 localStorage 캐시
 
-const CACHE_KEY = 'subscout_exchange_rate';
+const CACHE_KEY = 'haedok_exchange_rate';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24h
 
 interface ExchangeRateCache {
@@ -41,12 +41,18 @@ export async function getUSDtoKRW(): Promise<number> {
   return 1450;
 }
 
-/** Convert USD to KRW with precise calculation */
+/** VAT rate for overseas digital services (Korean tax law) */
+const VAT_RATE = 0.1;
+
+/** Convert USD to KRW with 10% VAT (해외 디지털 서비스 부가세) */
 export function convertUSDtoKRW(usdAmount: number, rate: number): number {
-  return Math.round(usdAmount * rate * 100) / 100; // 소수점 2자리까지
+  const baseKRW = usdAmount * rate;
+  const withVAT = baseKRW * (1 + VAT_RATE);
+  return Math.round(withVAT);
 }
 
-/** Format exchange rate info */
+/** Format exchange rate info (부가세 포함 표시) */
 export function formatExchangeInfo(usdPrice: number, krwPrice: number, rate: number): string {
-  return `$${usdPrice.toFixed(2)} × ${rate.toFixed(2)}원 = ${krwPrice.toLocaleString('ko-KR')}원`;
+  const baseKRW = Math.round(usdPrice * rate);
+  return `$${usdPrice.toFixed(2)} × ${rate.toFixed(0)}원 + 부가세 10% = ${krwPrice.toLocaleString('ko-KR')}원`;
 }

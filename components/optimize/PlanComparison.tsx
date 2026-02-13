@@ -59,7 +59,7 @@ export function PlanComparison({ opportunity }: PlanComparisonProps) {
             </div>
             <div className="pt-3 border-t space-y-1">
               <div className="flex items-center gap-2 text-sm">
-                <X className="h-4 w-4 text-red-500" />
+                <X className="h-4 w-4 text-red-500 dark:text-red-400" aria-hidden="true" />
                 <span className="text-muted-foreground">비용 절감 불가</span>
               </div>
             </div>
@@ -91,13 +91,13 @@ export function PlanComparison({ opportunity }: PlanComparisonProps) {
             </div>
             <div className="pt-3 border-t space-y-1">
               <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-green-500" />
+                <Check className="h-4 w-4 text-green-500 dark:text-green-400" aria-hidden="true" />
                 <span className="font-medium text-primary">
                   인당 월 {formatKRW(opportunity.savingsPerPerson)} 절약
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-green-500" />
+                <Check className="h-4 w-4 text-green-500 dark:text-green-400" aria-hidden="true" />
                 <span className="text-muted-foreground">
                   {opportunity.maxMembers}명 동시 사용 가능
                 </span>
