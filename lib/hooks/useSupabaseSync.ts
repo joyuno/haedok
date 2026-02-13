@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { useUsageStore } from '@/stores/usageStore';
+import { clearCachedUserId, setCachedUserId } from '@/lib/auth/ensureUserId';
 import type { Subscription, SubscriptionCategory, BillingCycle, SubscriptionStatus, UsageMetricType } from '@/lib/types/subscription';
 import type { WeeklyUsage } from '@/lib/types/usage';
 
@@ -23,9 +24,10 @@ export function useSupabaseSync() {
     // 로그아웃 감지: 이전에 user가 있었는데 지금 null이면 스토어 초기화
     if (!user) {
       if (prevUserId.current) {
+        clearCachedUserId();
         useSubscriptionStore.getState().reset();
         useUsageStore.getState().reset();
-        console.log('[Sync] 로그아웃 감지 → 스토어 초기화');
+        console.log('[Sync] 로그아웃 감지 → 스토어 + 캐시 초기화');
       }
       prevUserId.current = null;
       synced.current = false;
@@ -36,6 +38,7 @@ export function useSupabaseSync() {
     if (synced.current && prevUserId.current === user.id) return;
     synced.current = true;
     prevUserId.current = user.id;
+    setCachedUserId(user.id);
 
     // Supabase에서 데이터 로드
     (async () => {

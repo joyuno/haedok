@@ -7,14 +7,20 @@ import { calculateROIAnalysis } from '@/lib/calculations/roi';
 import { SERVICE_PRESETS } from '@/lib/constants/servicePresets';
 import type { ParsedUsageEntry } from '@/lib/utils/csvParser';
 import { supabase } from '@/lib/supabase';
+import { ensureUserId } from '@/lib/auth/ensureUserId';
 
-async function syncToSupabase(action: string, fn: () => Promise<{ error: any }>) {
+async function syncToSupabase(action: string, fn: (userId: string) => Promise<{ error: any }>) {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) return;
-    const { error } = await fn();
+    const userId = await ensureUserId();
+    if (!userId) {
+      console.warn(`[Supabase] ${action} 건너뜀: user_id 없음`);
+      return;
+    }
+    const { error } = await fn(userId);
     if (error) {
       console.error(`[Supabase] ${action} 실패:`, error.message);
+    } else {
+      console.log(`[Supabase] ${action} 성공`);
     }
   } catch (e) {
     console.error(`[Supabase] ${action} 에러:`, e);
@@ -72,10 +78,9 @@ export const useUsageStore = create<UsageState>()(
         usageRecords: [...state.usageRecords, record],
       }));
 
-      syncToSupabase('사용량 추가', async () => {
-        const { data: { session } } = await supabase.auth.getSession();
+      syncToSupabase('사용량 추가', async (userId) => {
         return supabase.from('usage_records').upsert({
-          id: record.id, user_id: session!.user.id, subscription_id: record.subscriptionId,
+          id: record.id, user_id: userId, subscription_id: record.subscriptionId,
           week_start_date: record.weekStartDate, usage_minutes: record.usageMinutes,
           metric_type: record.metricType, input_method: record.inputMethod,
           created_at: record.createdAt,
@@ -92,7 +97,7 @@ export const useUsageStore = create<UsageState>()(
         ),
       }));
 
-      syncToSupabase('사용량 수정', async () =>
+      syncToSupabase('사용량 수정', async (_userId) =>
         supabase.from('usage_records').update({
           usage_minutes: usageMinutes, updated_at: new Date().toISOString(),
         }).eq('id', id),
@@ -104,7 +109,7 @@ export const useUsageStore = create<UsageState>()(
         usageRecords: state.usageRecords.filter((r) => r.id !== id),
       }));
 
-      syncToSupabase('사용량 삭제', async () =>
+      syncToSupabase('사용량 삭제', async (_userId) =>
         supabase.from('usage_records').delete().eq('id', id),
       );
     },
@@ -136,16 +141,18 @@ export const useUsageStore = create<UsageState>()(
         // Bulk sync to Supabase
         (async () => {
           try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.user) return;
+            const userId = await ensureUserId();
+            if (!userId) return;
             const rows = newRecords.map((r) => ({
-              id: r.id, user_id: session.user.id, subscription_id: r.subscriptionId,
+              id: r.id, user_id: userId, subscription_id: r.subscriptionId,
               week_start_date: r.weekStartDate, usage_minutes: r.usageMinutes,
               input_method: r.inputMethod, created_at: r.createdAt,
             }));
             const { error } = await supabase.from('usage_records').upsert(rows);
             if (error) {
               console.error('[Supabase] CSV 임포트 실패:', error.message);
+            } else {
+              console.log(`[Supabase] CSV 임포트 ${rows.length}건 성공`);
             }
           } catch (e) {
             console.error('[Supabase] CSV 임포트 에러:', e);

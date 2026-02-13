@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
+import { setCachedUserId, clearCachedUserId } from '@/lib/auth/ensureUserId';
 
 interface Profile {
   id: string;
@@ -40,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user);
+        setCachedUserId(session.user.id);
         await fetchProfile(session.user.id);
       } else {
         // 세션이 없으면 익명 로그인으로 자동 생성
@@ -47,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const { data, error } = await supabase.auth.signInAnonymously();
           if (!error && data?.user) {
             setUser(data.user);
+            setCachedUserId(data.user.id);
             // 익명 사용자용 프로필 생성
             await supabase.from('profiles').upsert({
               id: data.user.id,
@@ -65,8 +68,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (_event, session) => {
         setUser(session?.user ?? null);
         if (session?.user) {
+          setCachedUserId(session.user.id);
           await fetchProfile(session.user.id);
         } else {
+          clearCachedUserId();
           setProfile(null);
         }
         setLoading(false);
@@ -92,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
+    clearCachedUserId();
     setUser(null);
     setProfile(null);
   }, []);

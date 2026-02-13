@@ -8,6 +8,7 @@ import type {
 } from '@/lib/types/subscription';
 import { calculateMonthlyPrice } from '@/lib/calculations/costAnalysis';
 import { supabase } from '@/lib/supabase';
+import { ensureUserId } from '@/lib/auth/ensureUserId';
 
 export interface AddSubscriptionInput {
   name: string;
@@ -62,13 +63,18 @@ interface SubscriptionState {
   getSubscriptionCount: () => number;
 }
 
-async function syncToSupabase(action: string, fn: () => Promise<{ error: any }>) {
+async function syncToSupabase(action: string, fn: (userId: string) => Promise<{ error: any }>) {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) return;
-    const { error } = await fn();
+    const userId = await ensureUserId();
+    if (!userId) {
+      console.warn(`[Supabase] ${action} 건너뜀: user_id 없음`);
+      return;
+    }
+    const { error } = await fn(userId);
     if (error) {
       console.error(`[Supabase] ${action} 실패:`, error.message);
+    } else {
+      console.log(`[Supabase] ${action} 성공`);
     }
   } catch (e) {
     console.error(`[Supabase] ${action} 에러:`, e);
@@ -110,10 +116,9 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         subscriptions: [...state.subscriptions, newSub],
       }));
 
-      syncToSupabase('구독 추가', async () => {
-        const { data: { session } } = await supabase.auth.getSession();
+      syncToSupabase('구독 추가', async (userId) => {
         return supabase.from('subscriptions').upsert({
-          id: newSub.id, user_id: session!.user.id, name: newSub.name, category: newSub.category,
+          id: newSub.id, user_id: userId, name: newSub.name, category: newSub.category,
           icon: newSub.icon, billing_cycle: newSub.billingCycle, price: newSub.price,
           monthly_price: newSub.monthlyPrice, billing_day: newSub.billingDay,
           status: newSub.status, is_shared: newSub.isShared, shared_count: newSub.sharedCount,
@@ -154,7 +159,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
 
       const updated = get().subscriptions.find((s) => s.id === id);
       if (updated) {
-        syncToSupabase('구독 수정', async () =>
+        syncToSupabase('구독 수정', async (_userId) =>
           supabase.from('subscriptions').update({
             name: updated.name, category: updated.category, icon: updated.icon,
             billing_cycle: updated.billingCycle, price: updated.price,
@@ -172,7 +177,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         subscriptions: state.subscriptions.filter((sub) => sub.id !== id),
       }));
 
-      syncToSupabase('구독 삭제', async () =>
+      syncToSupabase('구독 삭제', async (_userId) =>
         supabase.from('subscriptions').delete().eq('id', id),
       );
     },
@@ -198,7 +203,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         ],
       }));
 
-      syncToSupabase('구독 취소', async () =>
+      syncToSupabase('구독 취소', async (_userId) =>
         supabase.from('subscriptions').update({ status: 'cancelled', updated_at: now }).eq('id', id),
       );
     },
@@ -216,7 +221,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         ),
       }));
 
-      syncToSupabase('구독 재활성화', async () =>
+      syncToSupabase('구독 재활성화', async (_userId) =>
         supabase.from('subscriptions').update({ status: 'active', updated_at: now }).eq('id', id),
       );
     },
