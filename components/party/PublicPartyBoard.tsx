@@ -87,7 +87,7 @@ function formatRelativeDate(dateStr: string): string {
 // ── Component ──────────────────────────────────────────────────
 
 export function PublicPartyBoard() {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, isAnonymous } = useAuth();
 
   // Data
   const [posts, setPosts] = useState<PublicPartyPost[]>([]);
@@ -139,7 +139,7 @@ export function PublicPartyBoard() {
   }, []);
 
   const fetchMyApplications = useCallback(async () => {
-    if (!user || user.is_anonymous) { setMyApplications([]); return; }
+    if (!user || isAnonymous) { setMyApplications([]); return; }
     try {
       const { data } = await supabase
         .from('party_applications')

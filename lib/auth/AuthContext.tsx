@@ -15,6 +15,8 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  /** 익명 사용자인지 여부 (카카오 미로그인) */
+  isAnonymous: boolean;
   signInWithKakao: () => Promise<void>;
   signOut: () => Promise<void>;
   updateNickname: (nickname: string) => Promise<void>;
@@ -39,13 +41,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user);
-        setCachedUserId(session.user.id);
-        await fetchProfile(session.user.id);
-      } else {
-        // 세션이 없으면 익명 로그인으로 자동 생성
-        try {
+      try {
+        if (session?.user) {
+          setUser(session.user);
+          setCachedUserId(session.user.id);
+          await fetchProfile(session.user.id);
+        } else {
+          // 세션이 없으면 익명 로그인으로 자동 생성
           const { data, error } = await supabase.auth.signInAnonymously();
           if (!error && data?.user) {
             setUser(data.user);
@@ -57,27 +59,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }, { onConflict: 'id' });
             await fetchProfile(data.user.id);
           }
-        } catch (e) {
-          console.error('[Auth] 익명 로그인 실패:', e);
-        } finally {
-          setLoading(false);
         }
-        return;
+      } catch (e) {
+        console.error('[Auth] 세션 초기화 실패:', e);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          setCachedUserId(session.user.id);
-          await fetchProfile(session.user.id);
-        } else {
-          clearCachedUserId();
-          setProfile(null);
+        try {
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            setCachedUserId(session.user.id);
+            await fetchProfile(session.user.id);
+          } else {
+            clearCachedUserId();
+            setProfile(null);
+          }
+        } catch (e) {
+          console.error('[Auth] 상태 변경 처리 실패:', e);
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
@@ -131,8 +136,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return true;
   }, [user]);
 
+  // 익명 사용자 판별: is_anonymous 플래그 또는 이메일 없음
+  const isAnonymous = !user || user.is_anonymous === true || !user.email;
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signInWithKakao, signOut, updateNickname, deleteAccount }}>
+    <AuthContext.Provider value={{ user, profile, loading, isAnonymous, signInWithKakao, signOut, updateNickname, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );

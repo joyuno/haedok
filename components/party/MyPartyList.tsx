@@ -49,12 +49,12 @@ interface MyPartyListProps {
 export type { MyParty };
 
 export function MyPartyList({ onCreateClick, onPartyClick }: MyPartyListProps) {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, isAnonymous } = useAuth();
   const [parties, setParties] = useState<MyParty[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchMyParties = useCallback(async () => {
-    if (!user || user.is_anonymous) {
+    if (!user || isAnonymous) {
       setParties([]);
       setLoading(false);
       return;
@@ -109,7 +109,7 @@ export function MyPartyList({ onCreateClick, onPartyClick }: MyPartyListProps) {
 
     fetchMyParties();
 
-    if (!user || user.is_anonymous) return;
+    if (!user || isAnonymous) return;
 
     const channel = supabase
       .channel('my-parties-realtime')
@@ -130,7 +130,7 @@ export function MyPartyList({ onCreateClick, onPartyClick }: MyPartyListProps) {
   }
 
   // 비로그인 또는 익명 사용자면 로그인 안내 표시
-  if (!user || user.is_anonymous) {
+  if (!user || isAnonymous) {
     return (
       <Card className="rounded-2xl">
         <CardContent className="py-20 text-center">
