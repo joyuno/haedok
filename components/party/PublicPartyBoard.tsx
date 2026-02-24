@@ -150,7 +150,7 @@ export function PublicPartyBoard() {
     } catch (e) {
       console.error('[PublicPartyBoard] 내 신청 로드 실패:', e);
     }
-  }, [user]);
+  }, [user, isAnonymous]);
 
   const fetchPendingAppsForPost = useCallback(async (postId: string) => {
     const { data } = await supabase

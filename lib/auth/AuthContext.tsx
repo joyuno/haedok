@@ -40,8 +40,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    let mounted = true;
+
+    // async IIFE로 getSession reject도 반드시 catch
+    (async () => {
       try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted) return;
+
         if (session?.user) {
           setUser(session.user);
           setCachedUserId(session.user.id);
@@ -49,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           // 세션이 없으면 익명 로그인으로 자동 생성
           const { data, error } = await supabase.auth.signInAnonymously();
+          if (!mounted) return;
           if (!error && data?.user) {
             setUser(data.user);
             setCachedUserId(data.user.id);
@@ -63,12 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (e) {
         console.error('[Auth] 세션 초기화 실패:', e);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
-    });
+    })();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!mounted) return;
         try {
           setUser(session?.user ?? null);
           if (session?.user) {
@@ -81,12 +89,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (e) {
           console.error('[Auth] 상태 변경 처리 실패:', e);
         } finally {
-          setLoading(false);
+          if (mounted) setLoading(false);
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [fetchProfile]);
 
   const signInWithKakao = useCallback(async () => {

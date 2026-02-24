@@ -102,7 +102,7 @@ export function MyPartyList({ onCreateClick, onPartyClick }: MyPartyListProps) {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, isAnonymous]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -118,7 +118,7 @@ export function MyPartyList({ onCreateClick, onPartyClick }: MyPartyListProps) {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [fetchMyParties, user, authLoading]);
+  }, [fetchMyParties, user, authLoading, isAnonymous]);
 
   // 인증 로딩 중이면 스피너 표시
   if (authLoading) {
