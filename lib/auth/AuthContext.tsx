@@ -59,7 +59,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } catch (e) {
           console.error('[Auth] 익명 로그인 실패:', e);
+        } finally {
+          setLoading(false);
         }
+        return;
       }
       setLoading(false);
     });

@@ -120,27 +120,36 @@ export function PublicPartyBoard() {
   // ── Data Fetching ──────────────────────────────────────────
 
   const fetchPosts = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('public_party_posts')
-      .select('*')
-      .eq('visibility', 'public')
-      .order('created_at', { ascending: false })
-      .limit(50);
+    try {
+      const { data, error } = await supabase
+        .from('public_party_posts')
+        .select('*')
+        .eq('visibility', 'public')
+        .order('created_at', { ascending: false })
+        .limit(50);
 
-    if (!error && data) {
-      setPosts(data as PublicPartyPost[]);
+      if (!error && data) {
+        setPosts(data as PublicPartyPost[]);
+      }
+    } catch (e) {
+      console.error('[PublicPartyBoard] 게시글 로드 실패:', e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const fetchMyApplications = useCallback(async () => {
-    if (!user) { setMyApplications([]); return; }
-    const { data } = await supabase
-      .from('party_applications')
-      .select('*')
-      .eq('applicant_id', user.id)
-      .order('created_at', { ascending: false });
-    if (data) setMyApplications(data as PartyApplication[]);
+    if (!user || user.is_anonymous) { setMyApplications([]); return; }
+    try {
+      const { data } = await supabase
+        .from('party_applications')
+        .select('*')
+        .eq('applicant_id', user.id)
+        .order('created_at', { ascending: false });
+      if (data) setMyApplications(data as PartyApplication[]);
+    } catch (e) {
+      console.error('[PublicPartyBoard] 내 신청 로드 실패:', e);
+    }
   }, [user]);
 
   const fetchPendingAppsForPost = useCallback(async (postId: string) => {
@@ -323,7 +332,8 @@ export function PublicPartyBoard() {
   const selectedPreset = newService ? SERVICE_PRESETS[newService] : null;
   const recruitingPosts = posts.filter(p => p.status === 'recruiting');
 
-  if (loading || authLoading) {
+  // 공개 게시판: 게시글 로딩만 체크 (인증 대기 불필요)
+  if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

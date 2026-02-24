@@ -54,55 +54,62 @@ export function MyPartyList({ onCreateClick, onPartyClick }: MyPartyListProps) {
   const [loading, setLoading] = useState(true);
 
   const fetchMyParties = useCallback(async () => {
-    if (!user) {
+    if (!user || user.is_anonymous) {
       setParties([]);
       setLoading(false);
       return;
     }
 
-    // 1. Parties I created
-    const { data: ownedPosts } = await supabase
-      .from('public_party_posts')
-      .select('*')
-      .eq('author_id', user.id)
-      .order('created_at', { ascending: false });
-
-    // 2. Parties where I was accepted
-    const { data: acceptedApps } = await supabase
-      .from('party_applications')
-      .select('post_id')
-      .eq('applicant_id', user.id)
-      .eq('status', 'accepted');
-
-    const acceptedPostIds = (acceptedApps || []).map(a => a.post_id);
-
-    let memberPosts: typeof ownedPosts = [];
-    if (acceptedPostIds.length > 0) {
-      const { data } = await supabase
+    try {
+      // 1. Parties I created
+      const { data: ownedPosts } = await supabase
         .from('public_party_posts')
         .select('*')
-        .in('id', acceptedPostIds)
+        .eq('author_id', user.id)
         .order('created_at', { ascending: false });
-      memberPosts = data || [];
+
+      // 2. Parties where I was accepted
+      const { data: acceptedApps } = await supabase
+        .from('party_applications')
+        .select('post_id')
+        .eq('applicant_id', user.id)
+        .eq('status', 'accepted');
+
+      const acceptedPostIds = (acceptedApps || []).map(a => a.post_id);
+
+      let memberPosts: typeof ownedPosts = [];
+      if (acceptedPostIds.length > 0) {
+        const { data } = await supabase
+          .from('public_party_posts')
+          .select('*')
+          .in('id', acceptedPostIds)
+          .order('created_at', { ascending: false });
+        memberPosts = data || [];
+      }
+
+      // Combine and deduplicate
+      const ownedIds = new Set((ownedPosts || []).map(p => p.id));
+      const combined: MyParty[] = [
+        ...(ownedPosts || []).map(p => ({ ...p, role: 'owner' as const })),
+        ...(memberPosts || [])
+          .filter(p => !ownedIds.has(p.id))
+          .map(p => ({ ...p, role: 'member' as const })),
+      ];
+
+      setParties(combined);
+    } catch (e) {
+      console.error('[MyPartyList] 파티 목록 로드 실패:', e);
+    } finally {
+      setLoading(false);
     }
-
-    // Combine and deduplicate
-    const ownedIds = new Set((ownedPosts || []).map(p => p.id));
-    const combined: MyParty[] = [
-      ...(ownedPosts || []).map(p => ({ ...p, role: 'owner' as const })),
-      ...(memberPosts || [])
-        .filter(p => !ownedIds.has(p.id))
-        .map(p => ({ ...p, role: 'member' as const })),
-    ];
-
-    setParties(combined);
-    setLoading(false);
   }, [user]);
 
   useEffect(() => {
+    if (authLoading) return;
+
     fetchMyParties();
 
-    if (!user) return;
+    if (!user || user.is_anonymous) return;
 
     const channel = supabase
       .channel('my-parties-realtime')
@@ -111,9 +118,10 @@ export function MyPartyList({ onCreateClick, onPartyClick }: MyPartyListProps) {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [fetchMyParties, user]);
+  }, [fetchMyParties, user, authLoading]);
 
-  if (loading || authLoading) {
+  // 인증 로딩 중이면 스피너 표시
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -121,7 +129,8 @@ export function MyPartyList({ onCreateClick, onPartyClick }: MyPartyListProps) {
     );
   }
 
-  if (!user) {
+  // 비로그인 또는 익명 사용자면 로그인 안내 표시
+  if (!user || user.is_anonymous) {
     return (
       <Card className="rounded-2xl">
         <CardContent className="py-20 text-center">
@@ -135,6 +144,15 @@ export function MyPartyList({ onCreateClick, onPartyClick }: MyPartyListProps) {
           </p>
         </CardContent>
       </Card>
+    );
+  }
+
+  // 로그인된 사용자: 파티 데이터 로딩 중
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
     );
   }
 
